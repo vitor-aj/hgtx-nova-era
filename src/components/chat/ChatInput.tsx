@@ -86,13 +86,14 @@ export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
 
         {/* Message Input and Buttons */}
         <div className="flex gap-2 items-end">
-          <div className="flex-1 glass-effect rounded-xl p-3">
+          <div className="flex-1 glass-effect rounded-xl p-3 flex flex-col-reverse">
             <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Digite sua mensagem..."
               className="min-h-[60px] max-h-[400px] resize-y border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 w-full p-0"
+              style={{ resize: 'vertical', direction: 'ltr' }}
             />
           </div>
 
