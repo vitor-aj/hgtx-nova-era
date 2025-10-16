@@ -1,7 +1,7 @@
-import { Send, Paperclip, X } from "lucide-react";
+import { Send, Paperclip, X, GripHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ChatInputProps {
@@ -11,8 +11,44 @@ interface ChatInputProps {
 export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [textareaHeight, setTextareaHeight] = useState(60);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const dragStartY = useRef<number>(0);
+  const dragStartHeight = useRef<number>(0);
   const { toast } = useToast();
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    dragStartY.current = e.clientY;
+    dragStartHeight.current = textareaHeight;
+    e.preventDefault();
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      
+      const deltaY = dragStartY.current - e.clientY; // Inverted: moving up = positive
+      const newHeight = Math.min(400, Math.max(60, dragStartHeight.current + deltaY));
+      setTextareaHeight(newHeight);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, textareaHeight]);
 
   const handleSend = () => {
     if (message.trim() || attachedFiles.length > 0) {
@@ -86,15 +122,30 @@ export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
 
         {/* Message Input and Buttons */}
         <div className="flex gap-2 items-end">
-          <div className="flex-1 glass-effect rounded-xl p-3 flex flex-col-reverse">
-            <Textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Digite sua mensagem..."
-              className="min-h-[60px] max-h-[400px] resize-y border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 w-full p-0"
-              style={{ resize: 'vertical', direction: 'ltr' }}
-            />
+          <div className="flex-1 glass-effect rounded-xl overflow-hidden">
+            {/* Resize Handle */}
+            <div
+              onMouseDown={handleMouseDown}
+              className={`w-full h-6 flex items-center justify-center cursor-ns-resize hover:bg-primary/10 transition-colors ${
+                isDragging ? 'bg-primary/20' : ''
+              }`}
+              title="Arraste para cima para aumentar"
+            >
+              <GripHorizontal className="w-5 h-5 text-muted-foreground" />
+            </div>
+            
+            {/* Textarea */}
+            <div className="px-3 pb-3">
+              <Textarea
+                ref={textareaRef}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Digite sua mensagem..."
+                style={{ height: `${textareaHeight}px` }}
+                className="resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 w-full p-0 overflow-y-auto"
+              />
+            </div>
           </div>
 
           {/* Action Buttons */}
