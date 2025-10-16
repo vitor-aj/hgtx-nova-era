@@ -21,6 +21,7 @@ export const ChatView = () => {
   const [isChatSidebarCollapsed, setIsChatSidebarCollapsed] = useState(false);
   const [selectedModel, setSelectedModel] = useState("ChatGPT 4.1");
   const [currentChatId, setCurrentChatId] = useState("1");
+  const [systemPrompt, setSystemPrompt] = useState("Você é um assistente útil e prestativo.");
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -66,7 +67,7 @@ export const ChatView = () => {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content:
-          "Esta é uma resposta simulada. Em breve, estarei conectado a modelos de IA reais para fornecer respostas inteligentes e úteis.",
+          `Resposta com base na personalidade: "${systemPrompt}". Esta é uma resposta simulada que considera as instruções de sistema definidas.`,
         model: selectedModel,
       };
       setMessages((prev) => [...prev, aiResponse]);
@@ -118,7 +119,11 @@ export const ChatView = () => {
           </div>
         </ScrollArea>
 
-        <ChatInput onSendMessage={handleSendMessage} />
+        <ChatInput 
+          onSendMessage={handleSendMessage}
+          systemPrompt={systemPrompt}
+          onSystemPromptChange={setSystemPrompt}
+        />
       </div>
     </div>
   );

@@ -1,18 +1,30 @@
-import { Send, Paperclip, X, GripHorizontal } from "lucide-react";
+import { Send, Paperclip, X, GripHorizontal, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface ChatInputProps {
   onSendMessage: (message: string, files?: File[]) => void;
+  systemPrompt: string;
+  onSystemPromptChange: (prompt: string) => void;
 }
 
-export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
+export const ChatInput = ({ onSendMessage, systemPrompt, onSystemPromptChange }: ChatInputProps) => {
   const [message, setMessage] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [textareaHeight, setTextareaHeight] = useState(60);
   const [isDragging, setIsDragging] = useState(false);
+  const [isPersonalityOpen, setIsPersonalityOpen] = useState(false);
+  const [tempSystemPrompt, setTempSystemPrompt] = useState(systemPrompt);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const dragStartY = useRef<number>(0);
@@ -91,6 +103,11 @@ export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
     setAttachedFiles(attachedFiles.filter((_, i) => i !== index));
   };
 
+  const handleSavePersonality = () => {
+    onSystemPromptChange(tempSystemPrompt);
+    setIsPersonalityOpen(false);
+  };
+
   return (
     <div className="border-t border-border bg-card/50 backdrop-blur-sm p-4">
       <div className="max-w-4xl mx-auto space-y-3">
@@ -158,6 +175,44 @@ export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
               onChange={handleFileSelect}
               accept=".pdf,.txt,.doc,.docx,.xls,.xlsx,.csv,.png,.jpg,.jpeg,.gif,.webp"
             />
+            <Dialog open={isPersonalityOpen} onOpenChange={setIsPersonalityOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-11 w-11 glass-effect"
+                  onClick={() => setTempSystemPrompt(systemPrompt)}
+                  title="Personalidade"
+                >
+                  <UserCog className="w-5 h-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Personalidade da IA</DialogTitle>
+                  <DialogDescription>
+                    Defina o estilo, tom ou função da IA nesta conversa
+                  </DialogDescription>
+                </DialogHeader>
+                <Textarea
+                  value={tempSystemPrompt}
+                  onChange={(e) => setTempSystemPrompt(e.target.value)}
+                  placeholder="Ex: Você é um assistente técnico especializado em programação..."
+                  className="min-h-[150px]"
+                />
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsPersonalityOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleSavePersonality}>
+                    Salvar
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
             <Button
               variant="outline"
               size="icon"
