@@ -90,6 +90,8 @@ export const ChatView = () => {
           showModelSelector={true}
           selectedModel={selectedModel}
           onModelChange={setSelectedModel}
+          systemPrompt={systemPrompt}
+          onSystemPromptChange={setSystemPrompt}
         />
 
         <ScrollArea className="flex-1">
@@ -119,11 +121,7 @@ export const ChatView = () => {
           </div>
         </ScrollArea>
 
-        <ChatInput 
-          onSendMessage={handleSendMessage}
-          systemPrompt={systemPrompt}
-          onSystemPromptChange={setSystemPrompt}
-        />
+        <ChatInput onSendMessage={handleSendMessage} />
       </div>
     </div>
   );
