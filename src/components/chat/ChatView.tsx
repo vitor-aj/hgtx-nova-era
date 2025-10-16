@@ -10,6 +10,11 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   model?: string;
+  attachments?: Array<{
+    name: string;
+    type: string;
+    size: number;
+  }>;
 }
 
 export const ChatView = () => {
@@ -26,11 +31,16 @@ export const ChatView = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = (content: string, files?: File[]) => {
     const newMessage: Message = {
       id: Date.now().toString(),
       role: "user",
       content,
+      attachments: files?.map((file) => ({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+      })),
     };
 
     setMessages((prev) => [...prev, newMessage]);
@@ -74,6 +84,7 @@ export const ChatView = () => {
                 role={message.role}
                 content={message.content}
                 model={message.model}
+                attachments={message.attachments}
               />
             ))}
 
