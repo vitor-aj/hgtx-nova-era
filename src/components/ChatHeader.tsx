@@ -9,9 +9,15 @@ import {
 
 interface ChatHeaderProps {
   showModelSelector?: boolean;
+  selectedModel?: string;
+  onModelChange?: (model: string) => void;
 }
 
-export const ChatHeader = ({ showModelSelector = false }: ChatHeaderProps) => {
+export const ChatHeader = ({ 
+  showModelSelector = false,
+  selectedModel = "ChatGPT 4.1",
+  onModelChange
+}: ChatHeaderProps) => {
   const models = [
     "ChatGPT 4.1",
     "ChatGPT 5",
@@ -27,17 +33,21 @@ export const ChatHeader = ({ showModelSelector = false }: ChatHeaderProps) => {
           <span className="text-sm text-muted-foreground">Online</span>
         </div>
         
-        {showModelSelector && (
+        {showModelSelector && onModelChange && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="gap-2 glass-effect">
-                <span className="font-medium">ChatGPT 4.1</span>
+                <span className="font-medium">{selectedModel}</span>
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="glass-effect bg-popover border-border z-50">
               {models.map((model) => (
-                <DropdownMenuItem key={model} className="cursor-pointer">
+                <DropdownMenuItem 
+                  key={model} 
+                  className="cursor-pointer"
+                  onClick={() => onModelChange(model)}
+                >
                   {model}
                 </DropdownMenuItem>
               ))}

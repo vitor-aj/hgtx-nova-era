@@ -9,15 +9,18 @@ interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  model?: string;
 }
 
 export const ChatView = () => {
   const [isChatSidebarCollapsed, setIsChatSidebarCollapsed] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("ChatGPT 4.1");
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       role: "assistant",
       content: "Olá! Sou o assistente HGTX Codex. Como posso ajudá-lo hoje?",
+      model: "ChatGPT 4.1",
     },
   ]);
 
@@ -40,6 +43,7 @@ export const ChatView = () => {
         role: "assistant",
         content:
           "Esta é uma resposta simulada. Em breve, estarei conectado a modelos de IA reais para fornecer respostas inteligentes e úteis.",
+        model: selectedModel,
       };
       setMessages((prev) => [...prev, aiResponse]);
       setIsLoading(false);
@@ -56,7 +60,11 @@ export const ChatView = () => {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        <ChatHeader showModelSelector={true} />
+        <ChatHeader 
+          showModelSelector={true}
+          selectedModel={selectedModel}
+          onModelChange={setSelectedModel}
+        />
 
         <ScrollArea className="flex-1">
           <div className="max-w-4xl mx-auto">
@@ -65,6 +73,7 @@ export const ChatView = () => {
                 key={message.id}
                 role={message.role}
                 content={message.content}
+                model={message.model}
               />
             ))}
 

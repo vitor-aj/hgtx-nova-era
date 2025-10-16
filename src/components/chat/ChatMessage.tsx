@@ -1,15 +1,27 @@
-import { Bot, User, Copy, Edit, Trash2 } from "lucide-react";
+import { Bot, User, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
+  model?: string;
 }
 
-export const ChatMessage = ({ role, content }: ChatMessageProps) => {
+export const ChatMessage = ({ role, content, model }: ChatMessageProps) => {
   const [showActions, setShowActions] = useState(false);
+  const { toast } = useToast();
   const isAssistant = role === "assistant";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(content);
+    toast({
+      title: "Copiado!",
+      description: "Mensagem copiada para a área de transferência",
+    });
+  };
 
   return (
     <div
@@ -19,17 +31,28 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
-      <div
-        className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-          isAssistant
-            ? "bg-gradient-to-br from-primary to-secondary"
-            : "bg-accent/20 border border-accent"
-        }`}
-      >
-        {isAssistant ? (
-          <Bot className="w-5 h-5 text-primary-foreground" />
-        ) : (
-          <User className="w-5 h-5 text-accent" />
+      <div className="flex flex-col items-center gap-2">
+        <div
+          className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+            isAssistant
+              ? "bg-gradient-to-br from-primary to-secondary"
+              : "bg-accent/20 border border-accent"
+          }`}
+        >
+          {isAssistant ? (
+            <Bot className="w-5 h-5 text-primary-foreground" />
+          ) : (
+            <User className="w-5 h-5 text-accent" />
+          )}
+        </div>
+        
+        {isAssistant && model && (
+          <Badge 
+            variant="secondary" 
+            className="text-xs px-2 py-0.5 bg-primary/10 text-primary border border-primary/30"
+          >
+            {model}
+          </Badge>
         )}
       </div>
 
@@ -43,26 +66,11 @@ export const ChatMessage = ({ role, content }: ChatMessageProps) => {
             <Button
               variant="ghost"
               size="sm"
+              onClick={handleCopy}
               className="h-7 px-2 text-muted-foreground hover:text-foreground"
             >
               <Copy className="w-3 h-3 mr-1" />
               Copiar
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-muted-foreground hover:text-foreground"
-            >
-              <Edit className="w-3 h-3 mr-1" />
-              Editar
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-muted-foreground hover:text-destructive"
-            >
-              <Trash2 className="w-3 h-3 mr-1" />
-              Excluir
             </Button>
           </div>
         )}
