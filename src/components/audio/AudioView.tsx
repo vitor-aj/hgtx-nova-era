@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { ChatHeader } from "@/components/ChatHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, Mic, Play, Download, Trash2, FileAudio, Copy } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Upload, Mic, Play, Download, Trash2, FileAudio, Copy, Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -82,6 +83,8 @@ export const AudioView = () => {
   const [generatedAudio, setGeneratedAudio] = useState<GeneratedAudio | null>(null);
   const [transcriptionHistory, setTranscriptionHistory] = useState<TranscriptionResult[]>([]);
   const [audioHistory, setAudioHistory] = useState<GeneratedAudio[]>([]);
+  const [transcriptionSearchQuery, setTranscriptionSearchQuery] = useState("");
+  const [audioSearchQuery, setAudioSearchQuery] = useState("");
   const { toast } = useToast();
 
   // Load history from localStorage
@@ -241,6 +244,17 @@ export const AudioView = () => {
     }
   };
 
+  // Filter functions
+  const filteredTranscriptions = transcriptionHistory.filter(item => 
+    item.fileName.toLowerCase().includes(transcriptionSearchQuery.toLowerCase()) ||
+    item.text.toLowerCase().includes(transcriptionSearchQuery.toLowerCase())
+  );
+
+  const filteredAudios = audioHistory.filter(item =>
+    item.voiceLabel.toLowerCase().includes(audioSearchQuery.toLowerCase()) ||
+    item.text.toLowerCase().includes(audioSearchQuery.toLowerCase())
+  );
+
   const handleDownloadTranscription = () => {
     if (transcriptionResult) {
       const blob = new Blob([transcriptionResult.text], { type: 'text/plain' });
@@ -262,11 +276,17 @@ export const AudioView = () => {
       <ScrollArea className="flex-1">
         <div className="max-w-4xl mx-auto p-6">
           <Tabs defaultValue="transcription" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 glass-effect">
+            <TabsList className="grid w-full grid-cols-4 glass-effect">
               <TabsTrigger value="transcription">
-                Transcrição de Áudio
+                Transcrição
               </TabsTrigger>
               <TabsTrigger value="generation">Geração de Voz</TabsTrigger>
+              <TabsTrigger value="transcription-history">
+                Histórico Transcrições
+              </TabsTrigger>
+              <TabsTrigger value="audio-history">
+                Histórico Áudios
+              </TabsTrigger>
             </TabsList>
 
             {/* Transcription Tab */}
@@ -500,103 +520,190 @@ export const AudioView = () => {
                 </div>
               )}
             </TabsContent>
+
+            {/* Transcription History Tab */}
+            <TabsContent value="transcription-history" className="space-y-6">
+              <div className="glass-effect rounded-xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Histórico de Transcrições</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {transcriptionHistory.length} {transcriptionHistory.length === 1 ? 'transcrição' : 'transcrições'}
+                  </p>
+                </div>
+                
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Pesquisar por nome ou conteúdo..."
+                    value={transcriptionSearchQuery}
+                    onChange={(e) => setTranscriptionSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
+              {filteredTranscriptions.length > 0 ? (
+                <div className="grid gap-3">
+                  {filteredTranscriptions.map((item) => (
+                    <div
+                      key={item.id}
+                      className="glass-effect rounded-lg p-4 space-y-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                            <FileAudio className="w-5 h-5 text-primary" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm truncate">{item.fileName}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(item.timestamp).toLocaleString('pt-BR')}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              navigator.clipboard.writeText(item.text);
+                              toast({ title: "Texto copiado" });
+                            }}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              const blob = new Blob([item.text], { type: 'text/plain' });
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `transcricao_${item.fileName}.txt`;
+                              a.click();
+                              URL.revokeObjectURL(url);
+                            }}
+                          >
+                            <Download className="w-3 h-3" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => handleDeleteTranscriptionFromHistory(item.id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-3">
+                        <p className="text-sm leading-relaxed line-clamp-3">
+                          {item.text}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="glass-effect rounded-xl p-12 text-center">
+                  <FileAudio className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground">
+                    {transcriptionSearchQuery 
+                      ? "Nenhuma transcrição encontrada com este termo"
+                      : "Nenhuma transcrição no histórico"}
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Audio History Tab */}
+            <TabsContent value="audio-history" className="space-y-6">
+              <div className="glass-effect rounded-xl p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">Histórico de Áudios Gerados</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {audioHistory.length} {audioHistory.length === 1 ? 'áudio' : 'áudios'}
+                  </p>
+                </div>
+                
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Pesquisar por voz ou conteúdo..."
+                    value={audioSearchQuery}
+                    onChange={(e) => setAudioSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
+              {filteredAudios.length > 0 ? (
+                <div className="grid gap-3">
+                  {filteredAudios.map((item) => (
+                    <div
+                      key={item.id}
+                      className="glass-effect rounded-lg p-4 space-y-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                            <Mic className="w-5 h-5 text-primary" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-sm">{item.voiceLabel}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(item.timestamp).toLocaleString('pt-BR')}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleDownloadAudio(item)}
+                          >
+                            <Download className="w-3 h-3" />
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => handleDeleteAudio(item.id)}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-3">
+                        <p className="text-sm leading-relaxed line-clamp-2">
+                          {item.text}
+                        </p>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-3 flex items-center gap-3">
+                        <Button size="icon" variant="outline" className="rounded-full h-8 w-8">
+                          <Play className="w-4 h-4" />
+                        </Button>
+                        <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                          <div className="h-full w-0 bg-primary rounded-full" />
+                        </div>
+                        <span className="text-xs text-muted-foreground tabular-nums">
+                          0:00
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="glass-effect rounded-xl p-12 text-center">
+                  <Mic className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground">
+                    {audioSearchQuery 
+                      ? "Nenhum áudio encontrado com este termo"
+                      : "Nenhum áudio no histórico"}
+                  </p>
+                </div>
+              )}
+            </TabsContent>
           </Tabs>
-
-          {/* History Section */}
-          <div className="mt-8 space-y-6">
-            {/* Transcription History */}
-            {transcriptionHistory.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Histórico de Transcrições</h3>
-                <div className="grid gap-3">
-                  {transcriptionHistory.map((item) => (
-                    <div
-                      key={item.id}
-                      className="glass-effect rounded-lg p-4 flex items-center justify-between hover:bg-muted/20 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                          <FileAudio className="w-5 h-5 text-primary" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm truncate">{item.fileName}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(item.timestamp).toLocaleString('pt-BR')}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2 shrink-0">
-                        <Button 
-                          size="icon" 
-                          variant="ghost"
-                          onClick={() => setTranscriptionResult(item)}
-                        >
-                          <Play className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          size="icon" 
-                          variant="ghost"
-                          onClick={() => handleDeleteTranscriptionFromHistory(item.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Audio Generation History */}
-            {audioHistory.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Histórico de Áudios Gerados</h3>
-                <div className="grid gap-3">
-                  {audioHistory.map((item) => (
-                    <div
-                      key={item.id}
-                      className="glass-effect rounded-lg p-4 flex items-center justify-between hover:bg-muted/20 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                          <Mic className="w-5 h-5 text-primary" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-sm">{item.voiceLabel}</p>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {new Date(item.timestamp).toLocaleString('pt-BR')}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2 shrink-0">
-                        <Button 
-                          size="icon" 
-                          variant="ghost"
-                          onClick={() => setGeneratedAudio(item)}
-                        >
-                          <Play className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          size="icon" 
-                          variant="ghost"
-                          onClick={() => handleDownloadAudio(item)}
-                        >
-                          <Download className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          size="icon" 
-                          variant="ghost"
-                          onClick={() => handleDeleteAudio(item.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </ScrollArea>
     </div>
