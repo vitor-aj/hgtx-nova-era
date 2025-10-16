@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { MessageSquare, Image, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { MessageSquare, Image, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface LayoutProps {
   children: React.ReactNode;
-  activeTab: "chat" | "images" | "audio";
-  onTabChange: (tab: "chat" | "images" | "audio") => void;
+  activeTab: "chat" | "images" | "audio" | "bots";
+  onTabChange: (tab: "chat" | "images" | "audio" | "bots") => void;
 }
 
-type TabType = "chat" | "images" | "audio";
+type TabType = "chat" | "images" | "audio" | "bots";
 
 export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -19,6 +19,7 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
     { id: "chat" as TabType, label: "Bate-papo", icon: MessageSquare },
     { id: "images" as TabType, label: "Imagens", icon: Image },
     { id: "audio" as TabType, label: "Áudio", icon: Mic },
+    { id: "bots" as TabType, label: "Bots", icon: Bot },
   ];
 
   return (
