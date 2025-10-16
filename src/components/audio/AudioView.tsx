@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ChatHeader } from "@/components/ChatHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, Mic, Play, Download, Copy, Trash2 } from "lucide-react";
+import { Upload, Mic, Play, Download, Trash2, FileAudio } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -12,14 +12,109 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+
+const SUPPORTED_FORMATS = ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm'];
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+
+interface TranscriptionResult {
+  id: string;
+  fileName: string;
+  text: string;
+  timestamp: Date;
+}
 
 export const AudioView = () => {
   const [textToSpeech, setTextToSpeech] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [transcriptionResult, setTranscriptionResult] = useState<TranscriptionResult | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const { toast } = useToast();
 
   const handleGenerateAudio = () => {
     setIsProcessing(true);
     setTimeout(() => setIsProcessing(false), 2000);
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "Arquivo muito grande",
+        description: "O arquivo deve ter no máximo 25 MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file format
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    if (!fileExtension || !SUPPORTED_FORMATS.includes(fileExtension)) {
+      toast({
+        title: "Formato não suportado",
+        description: `Formatos suportados: ${SUPPORTED_FORMATS.join(', ')}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSelectedFile(file);
+    handleTranscription(file);
+  };
+
+  const handleTranscription = async (file: File) => {
+    setIsTranscribing(true);
+    
+    // Simulate transcription - replace with actual API call
+    setTimeout(() => {
+      const result: TranscriptionResult = {
+        id: Date.now().toString(),
+        fileName: file.name,
+        text: "Esta é uma transcrição de exemplo do áudio enviado. O sistema utilizará modelos de IA avançados para converter sua fala em texto com alta precisão. O áudio foi processado com sucesso e convertido para texto.",
+        timestamp: new Date(),
+      };
+      
+      setTranscriptionResult(result);
+      setIsTranscribing(false);
+      
+      toast({
+        title: "Transcrição concluída",
+        description: "Seu áudio foi transcrito com sucesso!",
+      });
+    }, 2000);
+  };
+
+  const handleDeleteTranscription = () => {
+    setTranscriptionResult(null);
+    setSelectedFile(null);
+  };
+
+  const handleCopyTranscription = () => {
+    if (transcriptionResult) {
+      navigator.clipboard.writeText(transcriptionResult.text);
+      toast({
+        title: "Texto copiado",
+        description: "A transcrição foi copiada para a área de transferência",
+      });
+    }
+  };
+
+  const handleDownloadTranscription = () => {
+    if (transcriptionResult) {
+      const blob = new Blob([transcriptionResult.text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `transcricao_${transcriptionResult.fileName}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
   };
 
   return (
@@ -43,58 +138,98 @@ export const AudioView = () => {
                   Converter Áudio em Texto
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Envie um arquivo de áudio (.mp3, .wav) para transcrição
+                  Envie um arquivo de áudio para transcrição (máx. 25MB)
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Formatos: {SUPPORTED_FORMATS.join(', ')}
                 </p>
 
-                <div className="border-2 border-dashed border-border rounded-xl p-12 text-center space-y-4 hover:border-primary/50 transition-colors cursor-pointer">
+                <input
+                  type="file"
+                  id="audio-upload"
+                  className="hidden"
+                  accept={SUPPORTED_FORMATS.map(f => `.${f}`).join(',')}
+                  onChange={handleFileSelect}
+                />
+
+                <label
+                  htmlFor="audio-upload"
+                  className="border-2 border-dashed border-border rounded-xl p-12 text-center space-y-4 hover:border-primary/50 transition-colors cursor-pointer block"
+                >
                   <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-                    <Upload className="w-8 h-8 text-primary" />
+                    {selectedFile ? (
+                      <FileAudio className="w-8 h-8 text-primary" />
+                    ) : (
+                      <Upload className="w-8 h-8 text-primary" />
+                    )}
                   </div>
                   <div>
                     <p className="font-medium">
-                      Clique para selecionar ou arraste o arquivo
+                      {selectedFile ? selectedFile.name : "Clique para selecionar ou arraste o arquivo"}
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Suporta MP3, WAV (máx. 25MB)
+                      {selectedFile 
+                        ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB`
+                        : "Máximo 25 MB"
+                      }
                     </p>
                   </div>
-                  <Button variant="outline" className="gap-2">
-                    <Upload className="w-4 h-4" />
-                    Selecionar Arquivo
-                  </Button>
-                </div>
+                  {!selectedFile && (
+                    <Button variant="outline" className="gap-2" type="button">
+                      <Upload className="w-4 h-4" />
+                      Selecionar Arquivo
+                    </Button>
+                  )}
+                </label>
+
+                {isTranscribing && (
+                  <div className="bg-muted/30 rounded-lg p-6 flex items-center justify-center gap-3">
+                    <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                    <p className="text-sm font-medium">
+                      Transcrevendo áudio...
+                    </p>
+                  </div>
+                )}
               </div>
 
-              {/* Sample Transcription Result */}
-              <div className="glass-effect rounded-xl p-6 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold">audio_sample.mp3</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Transcrito há 5 minutos
+              {/* Transcription Result */}
+              {transcriptionResult && (
+                <div className="glass-effect rounded-xl p-6 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold">{transcriptionResult.fileName}</h4>
+                      <p className="text-xs text-muted-foreground">
+                        Transcrito {new Date(transcriptionResult.timestamp).toLocaleTimeString('pt-BR')}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="gap-1"
+                        onClick={handleDownloadTranscription}
+                      >
+                        <Download className="w-3 h-3" />
+                        Baixar
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive" 
+                        className="gap-1"
+                        onClick={handleDeleteTranscription}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Excluir
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="bg-muted/30 rounded-lg p-4">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                      {transcriptionResult.text}
                     </p>
                   </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="gap-1">
-                      <Copy className="w-3 h-3" />
-                      Copiar
-                    </Button>
-                    <Button size="sm" variant="outline" className="gap-1">
-                      <Download className="w-3 h-3" />
-                    </Button>
-                    <Button size="sm" variant="destructive" className="gap-1">
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
                 </div>
-                <div className="bg-muted/30 rounded-lg p-4">
-                  <p className="text-sm leading-relaxed">
-                    Esta é uma transcrição de exemplo do áudio enviado. O
-                    sistema utilizará modelos de IA avançados para converter
-                    sua fala em texto com alta precisão.
-                  </p>
-                </div>
-              </div>
+              )}
             </TabsContent>
 
             {/* Generation Tab */}
