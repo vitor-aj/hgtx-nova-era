@@ -82,15 +82,69 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
         </div>
       </aside>
       ) : (
-        <aside className="w-12 bg-sidebar border-r border-sidebar-border flex flex-col items-center py-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsSidebarCollapsed(false)}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </Button>
+        <aside className="w-16 bg-sidebar border-r border-sidebar-border flex flex-col">
+          {/* Collapsed Logo */}
+          <div className="p-4 border-b border-sidebar-border flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+              <span className="text-xs font-bold text-white">HX</span>
+            </div>
+          </div>
+
+          {/* New Chat Button - Icon only */}
+          <div className="p-3">
+            <Button size="icon" className="w-full cyber-glow">
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Navigation Icons */}
+          <nav className="flex-1 px-2 py-2 space-y-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  className={`w-full p-3 rounded-lg transition-all flex items-center justify-center ${
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground cyber-border"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  }`}
+                  title={tab.label}
+                >
+                  <Icon className="w-5 h-5" />
+                </button>
+              );
+            })}
+          </nav>
+
+          <Separator className="bg-sidebar-border" />
+
+          {/* Settings Icon */}
+          <div className="p-3 border-t border-sidebar-border">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="w-full text-sidebar-foreground"
+              title="Configurações"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Expand Button */}
+          <div className="p-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarCollapsed(false)}
+              className="w-full text-muted-foreground hover:text-foreground"
+              title="Expandir"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
         </aside>
       )}
 
