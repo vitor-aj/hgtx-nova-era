@@ -12,6 +12,7 @@ interface Message {
 }
 
 export const ChatView = () => {
+  const [isChatSidebarCollapsed, setIsChatSidebarCollapsed] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -48,7 +49,10 @@ export const ChatView = () => {
   return (
     <div className="flex h-full">
       {/* Chat Sidebar */}
-      <ChatSidebar />
+      <ChatSidebar 
+        isCollapsed={isChatSidebarCollapsed}
+        onToggleCollapse={() => setIsChatSidebarCollapsed(!isChatSidebarCollapsed)}
+      />
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">

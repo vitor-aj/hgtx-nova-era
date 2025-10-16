@@ -1,4 +1,5 @@
-import { MessageSquare, Image, Mic, Settings, Plus } from "lucide-react";
+import { useState } from "react";
+import { MessageSquare, Image, Mic, Settings, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -11,6 +12,7 @@ interface LayoutProps {
 type TabType = "chat" | "images" | "audio";
 
 export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const tabs = [
     { id: "chat" as TabType, label: "Bate-papo", icon: MessageSquare },
@@ -21,12 +23,23 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-72 bg-sidebar border-r border-sidebar-border flex flex-col">
-        {/* Logo */}
-        <div className="p-6 border-b border-sidebar-border">
-          <h1 className="text-2xl font-bold gradient-text">HGTX Codex</h1>
-          <p className="text-xs text-muted-foreground mt-1">AI Interface System</p>
-        </div>
+      {!isSidebarCollapsed ? (
+        <aside className="w-72 bg-sidebar border-r border-sidebar-border flex flex-col">
+          {/* Logo */}
+          <div className="p-6 border-b border-sidebar-border flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold gradient-text">HGTX Codex</h1>
+              <p className="text-xs text-muted-foreground mt-1">AI Interface System</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarCollapsed(true)}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+          </div>
 
         {/* New Chat Button */}
         <div className="p-4">
@@ -68,6 +81,18 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
           </Button>
         </div>
       </aside>
+      ) : (
+        <aside className="w-12 bg-sidebar border-r border-sidebar-border flex flex-col items-center py-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsSidebarCollapsed(false)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </aside>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
