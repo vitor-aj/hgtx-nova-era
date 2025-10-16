@@ -30,9 +30,7 @@ export const ChatMessage = ({ role, content, model, attachments }: ChatMessagePr
 
   return (
     <div
-      className={`flex gap-4 py-6 px-6 group ${
-        isAssistant ? "bg-muted/30" : ""
-      } hover:bg-muted/20 transition-colors ${
+      className={`flex gap-4 py-6 px-6 group hover:bg-muted/10 transition-colors ${
         isAssistant ? "justify-start" : "justify-end"
       }`}
       onMouseEnter={() => setShowActions(true)}
