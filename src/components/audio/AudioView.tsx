@@ -24,12 +24,52 @@ interface TranscriptionResult {
   timestamp: Date;
 }
 
+const VOICE_OPTIONS = {
+  alloy: {
+    label: "Alloy",
+    gender: "Masculina",
+    style: "Neutra, equilibrada, tom corporativo",
+    description: "Boa para tutoriais e comunicações institucionais."
+  },
+  echo: {
+    label: "Echo",
+    gender: "Masculina",
+    style: "Forte e profissional, mais grave",
+    description: "Ideal para voz de autoridade ou locução firme."
+  },
+  fable: {
+    label: "Fable",
+    gender: "Feminina",
+    style: "Narrativa, calorosa e envolvente",
+    description: "Ótima para storytelling e áudios empáticos."
+  },
+  onyx: {
+    label: "Onyx",
+    gender: "Masculina",
+    style: "Grave, autoritária, impactante",
+    description: "Excelente para trailers, mensagens sérias ou institucionais."
+  },
+  nova: {
+    label: "Nova",
+    gender: "Feminina",
+    style: "Brilhante, animada, energética",
+    description: "Boa para vídeos curtos, marketing ou conteúdos leves."
+  },
+  shimmer: {
+    label: "Shimmer",
+    gender: "Feminina",
+    style: "Suave, otimista, clara",
+    description: "Boa para mensagens acolhedoras, explicações e IA conversacional."
+  }
+};
+
 export const AudioView = () => {
   const [textToSpeech, setTextToSpeech] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcriptionResult, setTranscriptionResult] = useState<TranscriptionResult | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedVoice, setSelectedVoice] = useState<keyof typeof VOICE_OPTIONS>("alloy");
   const { toast } = useToast();
 
   const handleGenerateAudio = () => {
@@ -260,26 +300,41 @@ export const AudioView = () => {
                   />
                 </div>
 
-                <div className="flex gap-4 items-end">
-                  <div className="flex-1 space-y-2">
+                <div className="space-y-4">
+                  <div className="space-y-2">
                     <label className="text-sm font-medium">Tipo de Voz</label>
-                    <Select defaultValue="neutral">
+                    <Select value={selectedVoice} onValueChange={(value) => setSelectedVoice(value as keyof typeof VOICE_OPTIONS)}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="neutral">Neutra</SelectItem>
-                        <SelectItem value="masculine">Masculina</SelectItem>
-                        <SelectItem value="feminine">Feminina</SelectItem>
-                        <SelectItem value="child">Infantil</SelectItem>
+                        {Object.entries(VOICE_OPTIONS).map(([key, voice]) => (
+                          <SelectItem key={key} value={key}>
+                            {voice.label} - {voice.gender}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  {/* Voice Details */}
+                  <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">{VOICE_OPTIONS[selectedVoice].label}</p>
+                      <span className="text-xs text-muted-foreground">Modelo: OpenAI TTS-1</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      <strong>Estilo:</strong> {VOICE_OPTIONS[selectedVoice].style}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {VOICE_OPTIONS[selectedVoice].description}
+                    </p>
                   </div>
 
                   <Button
                     onClick={handleGenerateAudio}
                     disabled={!textToSpeech.trim() || isProcessing}
-                    className="gap-2 cyber-glow"
+                    className="gap-2 cyber-glow w-full"
                     size="lg"
                   >
                     <Mic className="w-4 h-4" />
