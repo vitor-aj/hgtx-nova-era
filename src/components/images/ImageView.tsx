@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ChatHeader } from "@/components/ChatHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Download, Copy, Trash2, Sparkles, Clock, Search } from "lucide-react";
+import { Download, Trash2, Sparkles, Clock, Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import {
@@ -231,9 +231,6 @@ const ImageCard = ({ image, onDelete }: ImageCardProps) => {
                 <Download className="w-3 h-3" />
                 Baixar
               </Button>
-              <Button size="sm" variant="secondary" className="gap-1">
-                <Copy className="w-3 h-3" />
-              </Button>
               <Button
                 size="sm"
                 variant="destructive"
@@ -241,6 +238,7 @@ const ImageCard = ({ image, onDelete }: ImageCardProps) => {
                 onClick={() => onDelete(image.id)}
               >
                 <Trash2 className="w-3 h-3" />
+                Excluir
               </Button>
             </div>
           </div>
