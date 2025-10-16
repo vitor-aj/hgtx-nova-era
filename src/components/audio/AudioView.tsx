@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ChatHeader } from "@/components/ChatHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, Mic, Play, Download, Trash2, FileAudio } from "lucide-react";
+import { Upload, Mic, Play, Download, Trash2, FileAudio, Copy } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -203,6 +203,15 @@ export const AudioView = () => {
                       </p>
                     </div>
                     <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="gap-1"
+                        onClick={handleCopyTranscription}
+                      >
+                        <Copy className="w-3 h-3" />
+                        Copiar
+                      </Button>
                       <Button 
                         size="sm" 
                         variant="outline" 
