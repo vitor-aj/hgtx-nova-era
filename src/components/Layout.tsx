@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageSquare, Image, Mic, Settings, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { MessageSquare, Image, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -73,8 +73,8 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
             <ThemeToggle />
           </div>
           <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground">
-            <Settings className="w-4 h-4" />
-            Configurações
+            <ArrowLeft className="w-4 h-4" />
+            Voltar
           </Button>
         </div>
       </aside>
@@ -129,9 +129,9 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
               variant="ghost" 
               size="icon" 
               className="w-full text-sidebar-foreground"
-              title="Configurações"
+              title="Voltar"
             >
-              <Settings className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4" />
             </Button>
           </div>
         </aside>
