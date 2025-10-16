@@ -1,0 +1,79 @@
+import { useState } from "react";
+import { ChatHeader } from "@/components/ChatHeader";
+import { ChatMessage } from "./ChatMessage";
+import { ChatInput } from "./ChatInput";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+}
+
+export const ChatView = () => {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "1",
+      role: "assistant",
+      content: "Olá! Sou o assistente HGTX Codex. Como posso ajudá-lo hoje?",
+    },
+  ]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSendMessage = (content: string) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content,
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
+    setIsLoading(true);
+
+    // Simulate AI response
+    setTimeout(() => {
+      const aiResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content:
+          "Esta é uma resposta simulada. Em breve, estarei conectado a modelos de IA reais para fornecer respostas inteligentes e úteis.",
+      };
+      setMessages((prev) => [...prev, aiResponse]);
+      setIsLoading(false);
+    }, 1500);
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <ChatHeader />
+
+      <ScrollArea className="flex-1">
+        <div className="max-w-4xl mx-auto">
+          {messages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              role={message.role}
+              content={message.content}
+            />
+          ))}
+
+          {isLoading && (
+            <div className="flex gap-4 py-6 px-6 bg-muted/30">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+              </div>
+              <div className="flex gap-1 items-center">
+                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-100" />
+                <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200" />
+              </div>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+
+      <ChatInput onSendMessage={handleSendMessage} />
+    </div>
+  );
+};

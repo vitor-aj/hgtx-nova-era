@@ -1,13 +1,18 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Layout } from "@/components/Layout";
+import { ChatView } from "@/components/chat/ChatView";
+import { ImageView } from "@/components/images/ImageView";
+import { AudioView } from "@/components/audio/AudioView";
 
 const Index = () => {
+  const [activeView, setActiveView] = useState<"chat" | "images" | "audio">("chat");
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <Layout activeTab={activeView} onTabChange={setActiveView}>
+      {activeView === "chat" && <ChatView />}
+      {activeView === "images" && <ImageView />}
+      {activeView === "audio" && <AudioView />}
+    </Layout>
   );
 };
 
