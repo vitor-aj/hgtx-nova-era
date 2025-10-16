@@ -34,7 +34,7 @@ export const BotChat = ({ bot, onBack }: BotChatProps) => {
     {
       id: "1",
       role: "assistant",
-      content: `Olá! Sou ${bot.name}. ${bot.prompt}`,
+      content: "Envie sua mensagem",
       model: bot.model,
     },
   ]);
