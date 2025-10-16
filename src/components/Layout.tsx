@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MessageSquare, Image, Mic, Settings, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -73,8 +74,12 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
 
         <Separator className="bg-sidebar-border" />
 
-        {/* Settings */}
-        <div className="p-4 border-t border-sidebar-border">
+        {/* Settings & Theme */}
+        <div className="p-4 border-t border-sidebar-border space-y-2">
+          <div className="flex items-center justify-between px-3">
+            <span className="text-sm font-medium text-sidebar-foreground">Tema</span>
+            <ThemeToggle />
+          </div>
           <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground">
             <Settings className="w-4 h-4" />
             Configurações
@@ -132,8 +137,9 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
 
           <Separator className="bg-sidebar-border" />
 
-          {/* Settings Icon */}
-          <div className="p-3 border-t border-sidebar-border">
+          {/* Theme & Settings Icons */}
+          <div className="p-3 border-t border-sidebar-border space-y-2">
+            <ThemeToggle />
             <Button 
               variant="ghost" 
               size="icon" 
