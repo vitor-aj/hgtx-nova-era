@@ -46,9 +46,10 @@ interface ChatFolder {
 interface ChatSidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  onNewChat: () => void;
 }
 
-export const ChatSidebar = ({ isCollapsed, onToggleCollapse }: ChatSidebarProps) => {
+export const ChatSidebar = ({ isCollapsed, onToggleCollapse, onNewChat }: ChatSidebarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
   const [isEditFolderOpen, setIsEditFolderOpen] = useState(false);
@@ -218,7 +219,7 @@ export const ChatSidebar = ({ isCollapsed, onToggleCollapse }: ChatSidebarProps)
           />
         </div>
 
-        <Button className="w-full gap-2 cyber-glow" variant="default">
+        <Button className="w-full gap-2 cyber-glow" variant="default" onClick={onNewChat}>
           <Plus className="w-4 h-4" />
           Novo Chat
         </Button>

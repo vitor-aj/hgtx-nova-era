@@ -20,6 +20,7 @@ interface Message {
 export const ChatView = () => {
   const [isChatSidebarCollapsed, setIsChatSidebarCollapsed] = useState(false);
   const [selectedModel, setSelectedModel] = useState("ChatGPT 4.1");
+  const [currentChatId, setCurrentChatId] = useState("1");
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -30,6 +31,19 @@ export const ChatView = () => {
   ]);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleNewChat = () => {
+    const newChatId = Date.now().toString();
+    setCurrentChatId(newChatId);
+    setMessages([
+      {
+        id: "1",
+        role: "assistant",
+        content: "Olá! Sou o assistente HGTX Codex. Como posso ajudá-lo hoje?",
+        model: selectedModel,
+      },
+    ]);
+  };
 
   const handleSendMessage = (content: string, files?: File[]) => {
     const newMessage: Message = {
@@ -66,6 +80,7 @@ export const ChatView = () => {
       <ChatSidebar 
         isCollapsed={isChatSidebarCollapsed}
         onToggleCollapse={() => setIsChatSidebarCollapsed(!isChatSidebarCollapsed)}
+        onNewChat={handleNewChat}
       />
 
       {/* Main Chat Area */}

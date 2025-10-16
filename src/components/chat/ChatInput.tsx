@@ -90,7 +90,7 @@ export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Digite sua mensagem..."
-            className="min-h-[60px] max-h-[200px] resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pr-24"
+            className="min-h-[60px] max-h-[400px] resize-y border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 pr-24"
           />
           
           <div className="absolute right-2 bottom-2 flex items-center gap-1">
