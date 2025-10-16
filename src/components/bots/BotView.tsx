@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bot, Edit, MessageSquare, Trash2 } from "lucide-react";
+import { Bot, Edit, MessageSquare, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,12 +27,26 @@ export const BotView = ({ onStartChat }: BotViewProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedBot, setSelectedBot] = useState<Bot | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   const [formData, setFormData] = useState({
     name: "",
     prompt: "",
     model: "ChatGPT 4.1",
   });
+
+  // Pagination calculations
+  const totalPages = Math.ceil(bots.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentBots = bots.slice(startIndex, endIndex);
+
+  // Reset to page 1 when items per page changes
+  const handleItemsPerPageChange = (value: string) => {
+    setItemsPerPage(Number(value));
+    setCurrentPage(1);
+  };
 
   const handleCreateBot = () => {
     const newBot: Bot = {
@@ -186,7 +200,7 @@ export const BotView = ({ onStartChat }: BotViewProps) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {bots.map((bot) => (
+                {currentBots.map((bot) => (
                   <TableRow key={bot.id}>
                     <TableCell className="font-medium">{bot.name}</TableCell>
                     <TableCell>{bot.model}</TableCell>
@@ -222,6 +236,64 @@ export const BotView = ({ onStartChat }: BotViewProps) => {
                 ))}
               </TableBody>
             </Table>
+
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-between mt-6 border-t pt-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Itens por página:</span>
+                <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="25">25</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  Página {currentPage} de {totalPages} ({bots.length} total)
+                </span>
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setCurrentPage(1)}
+                    disabled={currentPage === 1}
+                  >
+                    Primeira
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Última
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
