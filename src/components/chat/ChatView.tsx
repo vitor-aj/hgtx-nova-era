@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChatHeader } from "@/components/ChatHeader";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
+import { ChatSidebar } from "./ChatSidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Message {
@@ -45,35 +46,41 @@ export const ChatView = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <ChatHeader />
+    <div className="flex h-full">
+      {/* Chat Sidebar */}
+      <ChatSidebar />
 
-      <ScrollArea className="flex-1">
-        <div className="max-w-4xl mx-auto">
-          {messages.map((message) => (
-            <ChatMessage
-              key={message.id}
-              role={message.role}
-              content={message.content}
-            />
-          ))}
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        <ChatHeader />
 
-          {isLoading && (
-            <div className="flex gap-4 py-6 px-6 bg-muted/30">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+        <ScrollArea className="flex-1">
+          <div className="max-w-4xl mx-auto">
+            {messages.map((message) => (
+              <ChatMessage
+                key={message.id}
+                role={message.role}
+                content={message.content}
+              />
+            ))}
+
+            {isLoading && (
+              <div className="flex gap-4 py-6 px-6 bg-muted/30">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                </div>
+                <div className="flex gap-1 items-center">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-100" />
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200" />
+                </div>
               </div>
-              <div className="flex gap-1 items-center">
-                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-100" />
-                <div className="w-2 h-2 bg-primary rounded-full animate-bounce delay-200" />
-              </div>
-            </div>
-          )}
-        </div>
-      </ScrollArea>
+            )}
+          </div>
+        </ScrollArea>
 
-      <ChatInput onSendMessage={handleSendMessage} />
+        <ChatInput onSendMessage={handleSendMessage} />
+      </div>
     </div>
   );
 };

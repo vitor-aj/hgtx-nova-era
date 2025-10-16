@@ -60,18 +60,6 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
 
         <Separator className="bg-sidebar-border" />
 
-        {/* Recent Section */}
-        <div className="p-4 space-y-2">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Recentes
-          </p>
-          <div className="space-y-1">
-            <div className="text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground px-3 py-2 rounded cursor-pointer hover:bg-sidebar-accent/30 transition-colors">
-              Conversa anterior...
-            </div>
-          </div>
-        </div>
-
         {/* Settings */}
         <div className="p-4 border-t border-sidebar-border">
           <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground">
