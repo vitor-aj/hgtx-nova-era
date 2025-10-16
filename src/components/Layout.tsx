@@ -83,10 +83,21 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
       </aside>
       ) : (
         <aside className="w-16 bg-sidebar border-r border-sidebar-border flex flex-col">
-          {/* Collapsed Logo */}
-          <div className="p-4 border-b border-sidebar-border flex items-center justify-center">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <span className="text-xs font-bold text-white">HX</span>
+          {/* Collapsed Header with Expand Button */}
+          <div className="p-3 border-b border-sidebar-border space-y-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSidebarCollapsed(false)}
+              className="w-full text-muted-foreground hover:text-foreground"
+              title="Expandir"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+            <div className="w-full flex justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <span className="text-xs font-bold text-white">HX</span>
+              </div>
             </div>
           </div>
 
@@ -130,19 +141,6 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
               title="Configurações"
             >
               <Settings className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Expand Button */}
-          <div className="p-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsSidebarCollapsed(false)}
-              className="w-full text-muted-foreground hover:text-foreground"
-              title="Expandir"
-            >
-              <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
         </aside>
