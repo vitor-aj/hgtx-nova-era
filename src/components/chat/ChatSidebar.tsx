@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Folder, FolderPlus, MessageSquare, MoreVertical, Trash2, Edit, FolderInput, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Folder, FolderPlus, MessageSquare, MoreVertical, Trash2, Edit, FolderInput, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -217,6 +217,11 @@ export const ChatSidebar = ({ isCollapsed, onToggleCollapse }: ChatSidebarProps)
             className="pl-9 bg-muted/50"
           />
         </div>
+
+        <Button className="w-full gap-2 cyber-glow" variant="default">
+          <Plus className="w-4 h-4" />
+          Novo Chat
+        </Button>
 
         <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
           <DialogTrigger asChild>

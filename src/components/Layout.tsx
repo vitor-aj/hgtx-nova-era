@@ -42,16 +42,8 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
             </Button>
           </div>
 
-        {/* New Chat Button */}
-        <div className="p-4">
-          <Button className="w-full gap-2 cyber-glow" variant="default">
-            <Plus className="w-4 h-4" />
-            Novo Chat
-          </Button>
-        </div>
-
-        {/* Navigation Tabs */}
-        <nav className="flex-1 px-3 py-2 space-y-1">
+          {/* Navigation Tabs */}
+          <nav className="flex-1 px-3 py-2 space-y-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -104,13 +96,6 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
                 <span className="text-xs font-bold text-white">HX</span>
               </div>
             </div>
-          </div>
-
-          {/* New Chat Button - Icon only */}
-          <div className="p-3">
-            <Button size="icon" className="w-full cyber-glow">
-              <Plus className="w-4 h-4" />
-            </Button>
           </div>
 
           {/* Navigation Icons */}
