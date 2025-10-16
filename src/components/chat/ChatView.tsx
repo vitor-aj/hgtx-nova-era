@@ -52,7 +52,7 @@ export const ChatView = () => {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        <ChatHeader />
+        <ChatHeader showModelSelector={true} />
 
         <ScrollArea className="flex-1">
           <div className="max-w-4xl mx-auto">

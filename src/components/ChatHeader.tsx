@@ -7,12 +7,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export const ChatHeader = () => {
+interface ChatHeaderProps {
+  showModelSelector?: boolean;
+}
+
+export const ChatHeader = ({ showModelSelector = false }: ChatHeaderProps) => {
   const models = [
     "ChatGPT 4.1",
-    "GPT-5 Mini",
-    "Claude 3.5 Sonnet",
-    "Gemini 2.5 Flash",
+    "ChatGPT 5",
+    "Claude Sonnet 4.5",
+    "Claude Opus 4.1",
   ];
 
   return (
@@ -23,25 +27,27 @@ export const ChatHeader = () => {
           <span className="text-sm text-muted-foreground">Online</span>
         </div>
         
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2 glass-effect">
-              <span className="font-medium">ChatGPT 4.1</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="glass-effect">
-            {models.map((model) => (
-              <DropdownMenuItem key={model} className="cursor-pointer">
-                {model}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {showModelSelector && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2 glass-effect">
+                <span className="font-medium">ChatGPT 4.1</span>
+                <ChevronDown className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="glass-effect bg-popover border-border z-50">
+              {models.map((model) => (
+                <DropdownMenuItem key={model} className="cursor-pointer">
+                  {model}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       <div className="text-sm text-muted-foreground">
-        Modelo de linguagem avançado
+        {showModelSelector ? "Modelo de linguagem avançado" : "Sistema HGTX Codex"}
       </div>
     </header>
   );
