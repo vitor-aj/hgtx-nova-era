@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChatHeader } from "@/components/ChatHeader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,6 +21,15 @@ interface TranscriptionResult {
   id: string;
   fileName: string;
   text: string;
+  timestamp: Date;
+}
+
+interface GeneratedAudio {
+  id: string;
+  text: string;
+  voice: string;
+  voiceLabel: string;
+  audioUrl: string;
   timestamp: Date;
 }
 
@@ -70,11 +79,51 @@ export const AudioView = () => {
   const [transcriptionResult, setTranscriptionResult] = useState<TranscriptionResult | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedVoice, setSelectedVoice] = useState<keyof typeof VOICE_OPTIONS>("alloy");
+  const [generatedAudio, setGeneratedAudio] = useState<GeneratedAudio | null>(null);
+  const [transcriptionHistory, setTranscriptionHistory] = useState<TranscriptionResult[]>([]);
+  const [audioHistory, setAudioHistory] = useState<GeneratedAudio[]>([]);
   const { toast } = useToast();
+
+  // Load history from localStorage
+  useEffect(() => {
+    const savedTranscriptions = localStorage.getItem('transcriptionHistory');
+    const savedAudios = localStorage.getItem('audioHistory');
+    if (savedTranscriptions) {
+      setTranscriptionHistory(JSON.parse(savedTranscriptions));
+    }
+    if (savedAudios) {
+      setAudioHistory(JSON.parse(savedAudios));
+    }
+  }, []);
 
   const handleGenerateAudio = () => {
     setIsProcessing(true);
-    setTimeout(() => setIsProcessing(false), 2000);
+    
+    // Simulate audio generation - replace with actual API call
+    setTimeout(() => {
+      const audio: GeneratedAudio = {
+        id: Date.now().toString(),
+        text: textToSpeech,
+        voice: selectedVoice,
+        voiceLabel: VOICE_OPTIONS[selectedVoice].label,
+        audioUrl: "data:audio/mp3;base64,//sample", // Placeholder
+        timestamp: new Date(),
+      };
+      
+      setGeneratedAudio(audio);
+      
+      // Add to history
+      const newHistory = [audio, ...audioHistory].slice(0, 10);
+      setAudioHistory(newHistory);
+      localStorage.setItem('audioHistory', JSON.stringify(newHistory));
+      
+      setIsProcessing(false);
+      
+      toast({
+        title: "Áudio gerado com sucesso",
+        description: `Voz: ${VOICE_OPTIONS[selectedVoice].label}`,
+      });
+    }, 2000);
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +168,12 @@ export const AudioView = () => {
       };
       
       setTranscriptionResult(result);
+      
+      // Add to history
+      const newHistory = [result, ...transcriptionHistory].slice(0, 10);
+      setTranscriptionHistory(newHistory);
+      localStorage.setItem('transcriptionHistory', JSON.stringify(newHistory));
+      
       setIsTranscribing(false);
       
       toast({
@@ -128,9 +183,52 @@ export const AudioView = () => {
     }, 2000);
   };
 
+  const handleDownloadAudio = (audio: GeneratedAudio) => {
+    // In real implementation, download the actual audio file
+    const a = document.createElement('a');
+    a.href = audio.audioUrl;
+    a.download = `audio_${audio.voiceLabel}_${new Date(audio.timestamp).getTime()}.mp3`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    toast({
+      title: "Download iniciado",
+      description: "O arquivo de áudio está sendo baixado.",
+    });
+  };
+
+  const handleDeleteAudio = (audioId: string) => {
+    if (generatedAudio?.id === audioId) {
+      setGeneratedAudio(null);
+    }
+    const newHistory = audioHistory.filter(a => a.id !== audioId);
+    setAudioHistory(newHistory);
+    localStorage.setItem('audioHistory', JSON.stringify(newHistory));
+    
+    toast({
+      title: "Áudio removido",
+      description: "O áudio foi removido do histórico.",
+    });
+  };
+
   const handleDeleteTranscription = () => {
     setTranscriptionResult(null);
     setSelectedFile(null);
+  };
+
+  const handleDeleteTranscriptionFromHistory = (transcriptionId: string) => {
+    if (transcriptionResult?.id === transcriptionId) {
+      setTranscriptionResult(null);
+    }
+    const newHistory = transcriptionHistory.filter(t => t.id !== transcriptionId);
+    setTranscriptionHistory(newHistory);
+    localStorage.setItem('transcriptionHistory', JSON.stringify(newHistory));
+    
+    toast({
+      title: "Transcrição removida",
+      description: "A transcrição foi removida do histórico.",
+    });
   };
 
   const handleCopyTranscription = () => {
@@ -352,67 +450,152 @@ export const AudioView = () => {
                 )}
               </div>
 
-              {/* Sample Generated Audio */}
-              <div className="glass-effect rounded-xl p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold">Áudio Gerado</h4>
-                    <p className="text-xs text-muted-foreground">
-                      Há 2 minutos · Voz Neutra
+              {/* Generated Audio Result */}
+              {generatedAudio && (
+                <div className="glass-effect rounded-xl p-6 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold">Áudio Gerado - {generatedAudio.voiceLabel}</h4>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(generatedAudio.timestamp).toLocaleString('pt-BR')}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="gap-1"
+                        onClick={() => handleDownloadAudio(generatedAudio)}
+                      >
+                        <Download className="w-3 h-3" />
+                        Baixar MP3
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive" 
+                        className="gap-1"
+                        onClick={() => handleDeleteAudio(generatedAudio.id)}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Excluir
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="bg-muted/30 rounded-lg p-4">
+                    <p className="text-sm leading-relaxed line-clamp-3">
+                      {generatedAudio.text}
                     </p>
                   </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="gap-1">
-                      <Download className="w-3 h-3" />
-                      Baixar
+                  <div className="bg-muted/30 rounded-lg p-4 flex items-center gap-4">
+                    <Button size="icon" variant="outline" className="rounded-full">
+                      <Play className="w-5 h-5" />
                     </Button>
-                    <Button size="sm" variant="destructive" className="gap-1">
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
+                    <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full w-0 bg-primary rounded-full" />
+                    </div>
+                    <span className="text-sm text-muted-foreground tabular-nums">
+                      0:00
+                    </span>
                   </div>
                 </div>
-
-                <div className="bg-muted/30 rounded-lg p-4 flex items-center gap-4">
-                  <Button size="icon" variant="outline" className="rounded-full">
-                    <Play className="w-5 h-5" />
-                  </Button>
-                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full w-1/3 bg-primary rounded-full" />
-                  </div>
-                  <span className="text-sm text-muted-foreground tabular-nums">
-                    0:12 / 0:35
-                  </span>
-                </div>
-              </div>
+              )}
             </TabsContent>
           </Tabs>
 
           {/* History Section */}
-          <div className="mt-8 space-y-4">
-            <h3 className="text-lg font-semibold">Histórico Recente</h3>
-            <div className="grid gap-3">
-              {[1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="glass-effect rounded-lg p-4 flex items-center justify-between hover:bg-muted/20 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Mic className="w-5 h-5 text-primary" />
+          <div className="mt-8 space-y-6">
+            {/* Transcription History */}
+            {transcriptionHistory.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Histórico de Transcrições</h3>
+                <div className="grid gap-3">
+                  {transcriptionHistory.map((item) => (
+                    <div
+                      key={item.id}
+                      className="glass-effect rounded-lg p-4 flex items-center justify-between hover:bg-muted/20 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                          <FileAudio className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm truncate">{item.fileName}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(item.timestamp).toLocaleString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        <Button 
+                          size="icon" 
+                          variant="ghost"
+                          onClick={() => setTranscriptionResult(item)}
+                        >
+                          <Play className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          variant="ghost"
+                          onClick={() => handleDeleteTranscriptionFromHistory(item.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-sm">audio_file_{i}.mp3</p>
-                      <p className="text-xs text-muted-foreground">
-                        Processado há {i} hora{i > 1 ? "s" : ""}
-                      </p>
-                    </div>
-                  </div>
-                  <Button size="icon" variant="ghost">
-                    <Play className="w-4 h-4" />
-                  </Button>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+
+            {/* Audio Generation History */}
+            {audioHistory.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Histórico de Áudios Gerados</h3>
+                <div className="grid gap-3">
+                  {audioHistory.map((item) => (
+                    <div
+                      key={item.id}
+                      className="glass-effect rounded-lg p-4 flex items-center justify-between hover:bg-muted/20 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                          <Mic className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-sm">{item.voiceLabel}</p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {new Date(item.timestamp).toLocaleString('pt-BR')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        <Button 
+                          size="icon" 
+                          variant="ghost"
+                          onClick={() => setGeneratedAudio(item)}
+                        >
+                          <Play className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          variant="ghost"
+                          onClick={() => handleDownloadAudio(item)}
+                        >
+                          <Download className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          variant="ghost"
+                          onClick={() => handleDeleteAudio(item.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </ScrollArea>
