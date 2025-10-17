@@ -70,55 +70,36 @@ export const OpinionDialog = ({
 
     setIsGenerating(true);
 
-    // Simulação de chamada à IA - aqui você integraria com a API real
-    setTimeout(() => {
-      const mockContent = `PARECER JURÍDICO
+    try {
+      const response = await fetch(
+        "https://prod-hgtx-intelligence-n8n.hgtx.com.br/webhook/codex/gepam/parecer-tecnico",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            titulo: title,
+            categoria: category,
+            instrucoes: instructions,
+          }),
+        }
+      );
 
-TÍTULO: ${title}
-CATEGORIA: ${category || "Não especificada"}
+      if (!response.ok) {
+        throw new Error("Erro ao gerar parecer");
+      }
 
-${instructions}
+      const data = await response.json();
+      const content = data.parecer || data.content || JSON.stringify(data, null, 2);
 
-ANÁLISE:
-
-Este parecer foi gerado com base nas instruções fornecidas. A análise considera os seguintes aspectos legais:
-
-1. Fundamentação Legal
-   - Análise da legislação aplicável ao caso
-   - Interpretação dos dispositivos legais pertinentes
-
-2. Precedentes Judiciais
-   - Jurisprudência dos tribunais superiores
-   - Decisões relevantes em casos semelhantes
-
-3. Doutrina Aplicável
-   - Posicionamento dos principais autores
-   - Análise crítica da literatura jurídica
-
-4. Conclusão e Recomendações
-   - Síntese dos pontos fundamentais
-   - Orientações práticas para o caso
-
-CONCLUSÃO:
-
-Com base na análise realizada, considerando a legislação vigente, a jurisprudência consolidada e a doutrina majoritária, conclui-se que os fundamentos apresentados nas instruções são juridicamente sustentáveis.
-
-Recomenda-se:
-- Acompanhamento da evolução legislativa
-- Monitoramento de novas decisões judiciais
-- Revisão periódica do presente parecer
-
-___________________________
-Parecer gerado em ${new Date().toLocaleDateString("pt-BR")}
-Profissional responsável: IA Jurídica HGTX Codex`;
-
-      setGeneratedContent(mockContent);
+      setGeneratedContent(content);
       setIsGenerating(false);
 
       const newOpinion: LegalOpinion = {
         id: selectedOpinion?.id || Date.now().toString(),
         title: title,
-        content: mockContent,
+        content: content,
         createdAt: new Date(),
         category: category || undefined,
       };
@@ -129,7 +110,15 @@ Profissional responsável: IA Jurídica HGTX Codex`;
         title: "Parecer gerado com sucesso!",
         description: "O parecer está pronto para download.",
       });
-    }, 2000);
+    } catch (error) {
+      console.error("Erro ao gerar parecer:", error);
+      setIsGenerating(false);
+      toast({
+        title: "Erro ao gerar parecer",
+        description: "Não foi possível gerar o parecer. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDownloadDocx = () => {
