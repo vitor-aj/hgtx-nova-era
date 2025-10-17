@@ -1,9 +1,17 @@
-import { Plus, Search, Trash2, FileText } from "lucide-react";
+import { Plus, Search, Trash2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LegalOpinion } from "./AgentView";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface AgentSidebarProps {
   opinions: LegalOpinion[];
@@ -49,42 +57,63 @@ export const AgentSidebar = ({
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-2 space-y-1">
-          {filteredOpinions.map((opinion) => (
-            <div
-              key={opinion.id}
-              className={`group relative p-3 rounded-lg cursor-pointer transition-colors ${
-                selectedOpinionId === opinion.id
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
-              }`}
-              onClick={() => onSelectOpinion(opinion)}
-            >
-              <div className="flex items-start gap-2">
-                <FileText className="w-4 h-4 mt-1 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{opinion.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(opinion.createdAt).toLocaleDateString('pt-BR')}
-                  </p>
-                  {opinion.category && (
-                    <p className="text-xs text-muted-foreground mt-1">{opinion.category}</p>
-                  )}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDeleteOpinion(opinion.id);
-                  }}
+        <div className="p-2">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Título</TableHead>
+                <TableHead className="w-[120px]">Data</TableHead>
+                <TableHead className="w-[100px] text-center">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredOpinions.map((opinion) => (
+                <TableRow
+                  key={opinion.id}
+                  className={selectedOpinionId === opinion.id ? "bg-sidebar-accent" : ""}
                 >
-                  <Trash2 className="w-3 h-3" />
-                </Button>
-              </div>
+                  <TableCell className="font-medium">
+                    <div>
+                      <p className="truncate">{opinion.title}</p>
+                      {opinion.category && (
+                        <p className="text-xs text-muted-foreground mt-1">{opinion.category}</p>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {new Date(opinion.createdAt).toLocaleDateString('pt-BR')}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => onSelectOpinion(opinion)}
+                        title="Visualizar"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        onClick={() => onDeleteOpinion(opinion.id)}
+                        title="Excluir"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          {filteredOpinions.length === 0 && (
+            <div className="text-center text-muted-foreground py-8">
+              <p className="text-sm">Nenhum parecer encontrado</p>
             </div>
-          ))}
+          )}
         </div>
       </ScrollArea>
     </div>
