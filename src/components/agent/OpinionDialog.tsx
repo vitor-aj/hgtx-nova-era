@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { Download, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -71,27 +72,21 @@ export const OpinionDialog = ({
     setIsGenerating(true);
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "https://prod-hgtx-intelligence-n8n.hgtx.com.br/webhook/codex/gepam/parecer-tecnico",
         {
-          method: "POST",
+          titulo: title,
+          categoria: category,
+          instrucoes: instructions,
+        },
+        {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            titulo: title,
-            categoria: category,
-            instrucoes: instructions,
-          }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Erro ao gerar parecer");
-      }
-
-      const data = await response.json();
-      const content = data.parecer || data.content || JSON.stringify(data, null, 2);
+      const content = response.data.parecer || response.data.content || JSON.stringify(response.data, null, 2);
 
       setGeneratedContent(content);
       setIsGenerating(false);
@@ -113,9 +108,20 @@ export const OpinionDialog = ({
     } catch (error) {
       console.error("Erro ao gerar parecer:", error);
       setIsGenerating(false);
+      
+      let errorMessage = "Não foi possível gerar o parecer. Tente novamente.";
+      
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          errorMessage = error.response.data?.message || `Erro do servidor: ${error.response.status}`;
+        } else if (error.request) {
+          errorMessage = "Sem resposta do servidor. Verifique sua conexão.";
+        }
+      }
+      
       toast({
         title: "Erro ao gerar parecer",
-        description: "Não foi possível gerar o parecer. Tente novamente.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
