@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { MessageSquare, Image, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight, Bot } from "lucide-react";
+import { MessageSquare, Image, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight, Bot, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface LayoutProps {
   children: React.ReactNode;
-  activeTab: "chat" | "images" | "audio" | "bots";
-  onTabChange: (tab: "chat" | "images" | "audio" | "bots") => void;
+  activeTab: "chat" | "images" | "audio" | "bots" | "agent";
+  onTabChange: (tab: "chat" | "images" | "audio" | "bots" | "agent") => void;
 }
 
-type TabType = "chat" | "images" | "audio" | "bots";
+type TabType = "chat" | "images" | "audio" | "bots" | "agent";
 
 export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -20,6 +20,7 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
     { id: "images" as TabType, label: "Imagens", icon: Image },
     { id: "audio" as TabType, label: "Áudio", icon: Mic },
     { id: "bots" as TabType, label: "Bots", icon: Bot },
+    { id: "agent" as TabType, label: "Agente de Parecer", icon: FileText },
   ];
 
   return (

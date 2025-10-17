@@ -5,6 +5,7 @@ import { ImageView } from "@/components/images/ImageView";
 import { AudioView } from "@/components/audio/AudioView";
 import { BotView } from "@/components/bots/BotView";
 import { BotChat } from "@/components/bots/BotChat";
+import { AgentView } from "@/components/agent/AgentView";
 
 interface Bot {
   id: string;
@@ -14,7 +15,7 @@ interface Bot {
 }
 
 const Index = () => {
-  const [activeView, setActiveView] = useState<"chat" | "images" | "audio" | "bots">("chat");
+  const [activeView, setActiveView] = useState<"chat" | "images" | "audio" | "bots" | "agent">("chat");
   const [activeBotChat, setActiveBotChat] = useState<Bot | null>(null);
 
   const handleStartBotChat = (bot: Bot) => {
@@ -37,6 +38,7 @@ const Index = () => {
           <BotView onStartChat={handleStartBotChat} />
         )
       )}
+      {activeView === "agent" && <AgentView />}
     </Layout>
   );
 };
