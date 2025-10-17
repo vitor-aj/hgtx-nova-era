@@ -152,7 +152,7 @@ Profissional responsável: IA Jurídica HGTX Codex`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh]">
+      <DialogContent className="max-w-[95vw] md:max-w-4xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>
             {selectedOpinion ? "Gerar Novo Modelo do Parecer" : "Novo Parecer Jurídico"}

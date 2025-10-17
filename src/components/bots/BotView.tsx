@@ -95,19 +95,19 @@ export const BotView = ({ onStartChat }: BotViewProps) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
-      <div className="border-b border-border p-6">
-        <div className="flex items-center justify-between">
+    <div className="flex-1 flex flex-col h-full overflow-hidden pb-16 md:pb-0">
+      <div className="border-b border-border p-3 md:p-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Bot className="w-6 h-6" />
+            <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">
+              <Bot className="w-5 h-5 md:w-6 md:h-6" />
               Gerenciador de Bots
             </h2>
-            <p className="text-muted-foreground mt-1">Crie e gerencie seus assistentes de IA</p>
+            <p className="text-sm md:text-base text-muted-foreground mt-1">Crie e gerencie seus assistentes de IA</p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="w-full md:w-auto text-sm">
                 <Bot className="w-4 h-4 mr-2" />
                 Criar Bot
               </Button>
@@ -167,7 +167,7 @@ export const BotView = ({ onStartChat }: BotViewProps) => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-3 md:p-6">
         {bots.length === 0 ? (
           <Card className="max-w-2xl mx-auto mt-12">
             <CardHeader>
@@ -190,45 +190,48 @@ export const BotView = ({ onStartChat }: BotViewProps) => {
             </CardContent>
           </Card>
         ) : (
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Modelo</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                  <TableHead className="text-xs md:text-sm">Nome</TableHead>
+                  <TableHead className="hidden md:table-cell text-sm">Modelo</TableHead>
+                  <TableHead className="text-right text-xs md:text-sm">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {currentBots.map((bot) => (
                   <TableRow key={bot.id}>
-                    <TableCell className="font-medium">{bot.name}</TableCell>
-                    <TableCell>{bot.model}</TableCell>
+                    <TableCell className="font-medium text-xs md:text-sm">{bot.name}</TableCell>
+                    <TableCell className="hidden md:table-cell text-sm">{bot.model}</TableCell>
                     <TableCell className="text-right">
-                      <div className="flex gap-2 justify-end">
+                      <div className="flex gap-1 justify-end flex-wrap">
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => onStartChat(bot)}
+                          className="text-xs md:text-sm"
                         >
-                          <MessageSquare className="w-4 h-4 mr-2" />
-                          Conversar
+                          <MessageSquare className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+                          <span className="hidden md:inline">Conversar</span>
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => openEditDialog(bot)}
+                          className="text-xs md:text-sm"
                         >
-                          <Edit className="w-4 h-4 mr-2" />
-                          Editar
+                          <Edit className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+                          <span className="hidden md:inline">Editar</span>
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => openDeleteDialog(bot)}
+                          className="text-xs md:text-sm"
                         >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Excluir
+                          <Trash2 className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
+                          <span className="hidden md:inline">Excluir</span>
                         </Button>
                       </div>
                     </TableCell>

@@ -92,19 +92,19 @@ export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
   };
 
   return (
-    <div className="border-t border-border bg-card/50 backdrop-blur-sm p-4">
-      <div className="max-w-4xl mx-auto space-y-3">
+    <div className="border-t border-border bg-card/50 backdrop-blur-sm p-2 md:p-4">
+      <div className="max-w-4xl mx-auto space-y-2 md:space-y-3">
         {/* Attached Files Preview */}
         {attachedFiles.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1 md:gap-2">
             {attachedFiles.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted border border-border text-sm"
+                className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 rounded-lg bg-muted border border-border text-xs md:text-sm"
               >
                 <Paperclip className="w-3 h-3 text-primary" />
-                <span className="font-medium">{file.name}</span>
-                <span className="text-xs text-muted-foreground">
+                <span className="font-medium truncate max-w-[100px] md:max-w-none">{file.name}</span>
+                <span className="hidden md:inline text-xs text-muted-foreground">
                   ({(file.size / 1024).toFixed(1)} KB)
                 </span>
                 <Button
@@ -121,12 +121,12 @@ export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
         )}
 
         {/* Message Input and Buttons */}
-        <div className="flex gap-2 items-end">
+        <div className="flex gap-1 md:gap-2 items-end">
           <div className="flex-1 glass-effect rounded-xl overflow-hidden">
-            {/* Resize Handle */}
+            {/* Resize Handle - Hidden on mobile */}
             <div
               onMouseDown={handleMouseDown}
-              className={`w-full h-6 flex items-center justify-center cursor-ns-resize hover:bg-primary/10 transition-colors ${
+              className={`hidden md:flex w-full h-6 items-center justify-center cursor-ns-resize hover:bg-primary/10 transition-colors ${
                 isDragging ? 'bg-primary/20' : ''
               }`}
               title="Arraste para cima para aumentar"
@@ -135,21 +135,21 @@ export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             </div>
             
             {/* Textarea */}
-            <div className="px-3 pb-3">
+            <div className="px-2 md:px-3 pb-2 md:pb-3 pt-2 md:pt-0">
               <Textarea
                 ref={textareaRef}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Digite sua mensagem..."
-                style={{ height: `${textareaHeight}px` }}
-                className="resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 w-full p-0 overflow-y-auto"
+                style={{ height: window.innerWidth < 768 ? '80px' : `${textareaHeight}px` }}
+                className="resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 w-full p-0 overflow-y-auto text-sm md:text-base"
               />
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-1 md:gap-2">
             <input
               ref={fileInputRef}
               type="file"
@@ -161,24 +161,24 @@ export const ChatInput = ({ onSendMessage }: ChatInputProps) => {
             <Button
               variant="outline"
               size="icon"
-              className="h-11 w-11 glass-effect"
+              className="h-9 w-9 md:h-11 md:w-11 glass-effect"
               onClick={() => fileInputRef.current?.click()}
               title="Anexar arquivo"
             >
-              <Paperclip className="w-5 h-5" />
+              <Paperclip className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
             <Button
               onClick={handleSend}
               size="icon"
-              className="h-11 w-11 cyber-glow"
+              className="h-9 w-9 md:h-11 md:w-11 cyber-glow"
               disabled={!message.trim() && attachedFiles.length === 0}
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="hidden md:block text-xs text-muted-foreground text-center">
           Pressione Enter para enviar, Shift + Enter para nova linha • Máx. 10MB por arquivo
         </p>
       </div>

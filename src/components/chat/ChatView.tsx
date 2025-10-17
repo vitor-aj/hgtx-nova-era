@@ -76,16 +76,18 @@ export const ChatView = () => {
   };
 
   return (
-    <div className="flex h-full">
-      {/* Chat Sidebar */}
-      <ChatSidebar 
-        isCollapsed={isChatSidebarCollapsed}
-        onToggleCollapse={() => setIsChatSidebarCollapsed(!isChatSidebarCollapsed)}
-        onNewChat={handleNewChat}
-      />
+    <div className="flex h-full w-full pb-16 md:pb-0">
+      {/* Chat Sidebar - Hidden on mobile */}
+      <div className="hidden md:block">
+        <ChatSidebar 
+          isCollapsed={isChatSidebarCollapsed}
+          onToggleCollapse={() => setIsChatSidebarCollapsed(!isChatSidebarCollapsed)}
+          onNewChat={handleNewChat}
+        />
+      </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full">
         <ChatHeader 
           showModelSelector={true}
           selectedModel={selectedModel}
@@ -95,7 +97,7 @@ export const ChatView = () => {
         />
 
         <ScrollArea className="flex-1">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto px-2 md:px-4">
             {messages.map((message) => (
               <ChatMessage
                 key={message.id}

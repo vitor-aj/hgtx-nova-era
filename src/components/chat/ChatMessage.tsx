@@ -30,22 +30,22 @@ export const ChatMessage = ({ role, content, model, attachments }: ChatMessagePr
 
   return (
     <div
-      className={`flex gap-4 py-6 px-6 group hover:bg-muted/10 transition-colors ${
+      className={`flex gap-2 md:gap-4 py-4 md:py-6 px-3 md:px-6 group hover:bg-muted/10 transition-colors ${
         isAssistant ? "justify-start" : "justify-end"
       }`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
       {isAssistant && (
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-primary to-secondary">
-            <Bot className="w-5 h-5 text-primary-foreground" />
+        <div className="flex flex-col items-center gap-1 md:gap-2">
+          <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-primary to-secondary">
+            <Bot className="w-4 h-4 md:w-5 md:h-5 text-primary-foreground" />
           </div>
           
           {model && (
             <Badge 
               variant="secondary" 
-              className="text-xs px-2 py-0.5 bg-primary/10 text-primary border border-primary/30"
+              className="hidden md:block text-xs px-2 py-0.5 bg-primary/10 text-primary border border-primary/30"
             >
               {model}
             </Badge>
@@ -53,7 +53,7 @@ export const ChatMessage = ({ role, content, model, attachments }: ChatMessagePr
         </div>
       )}
 
-      <div className={`flex-1 max-w-3xl space-y-2 ${isAssistant ? "" : "flex flex-col items-end"}`}>
+      <div className={`flex-1 max-w-3xl space-y-1 md:space-y-2 ${isAssistant ? "" : "flex flex-col items-end"}`}>
         {/* Attachments */}
         {attachments && attachments.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-2">
@@ -73,13 +73,13 @@ export const ChatMessage = ({ role, content, model, attachments }: ChatMessagePr
         )}
 
         <div
-          className={`inline-block px-4 py-3 rounded-xl ${
+          className={`inline-block px-3 md:px-4 py-2 md:py-3 rounded-xl ${
             isAssistant
               ? "bg-card border border-border"
               : "bg-gradient-to-br from-primary to-secondary text-primary-foreground"
           }`}
         >
-          <p className={`leading-relaxed ${isAssistant ? "text-foreground" : "text-white"}`}>
+          <p className={`text-sm md:text-base leading-relaxed ${isAssistant ? "text-foreground" : "text-white"}`}>
             {content}
           </p>
         </div>
@@ -100,8 +100,8 @@ export const ChatMessage = ({ role, content, model, attachments }: ChatMessagePr
       </div>
 
       {!isAssistant && (
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-accent/20 border border-accent">
-          <User className="w-5 h-5 text-accent" />
+        <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-accent/20 border border-accent">
+          <User className="w-4 h-4 md:w-5 md:h-5 text-accent" />
         </div>
       )}
     </div>

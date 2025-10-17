@@ -270,22 +270,22 @@ export const AudioView = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full pb-16 md:pb-0">
       <ChatHeader />
 
       <ScrollArea className="flex-1">
-        <div className="max-w-4xl mx-auto p-6">
-          <Tabs defaultValue="transcription" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 glass-effect">
-              <TabsTrigger value="transcription">
+        <div className="max-w-4xl mx-auto p-3 md:p-6">
+          <Tabs defaultValue="transcription" className="space-y-4 md:space-y-6">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 glass-effect text-xs md:text-sm">
+              <TabsTrigger value="transcription" className="text-xs md:text-sm">
                 Transcrição
               </TabsTrigger>
-              <TabsTrigger value="generation">Geração de Voz</TabsTrigger>
-              <TabsTrigger value="transcription-history">
-                Histórico Transcrições
+              <TabsTrigger value="generation" className="text-xs md:text-sm">Geração</TabsTrigger>
+              <TabsTrigger value="transcription-history" className="text-xs md:text-sm">
+                Hist. Trans.
               </TabsTrigger>
-              <TabsTrigger value="audio-history">
-                Histórico Áudios
+              <TabsTrigger value="audio-history" className="text-xs md:text-sm">
+                Hist. Áud.
               </TabsTrigger>
             </TabsList>
 

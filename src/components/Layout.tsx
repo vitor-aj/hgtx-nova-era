@@ -27,7 +27,7 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
     <div className="flex h-screen w-full bg-background overflow-hidden">
       {/* Sidebar */}
       {!isSidebarCollapsed ? (
-        <aside className="w-72 bg-sidebar border-r border-sidebar-border flex flex-col">
+        <aside className="hidden md:flex md:w-72 bg-sidebar border-r border-sidebar-border flex-col">
           {/* Logo */}
           <div className="p-6 border-b border-sidebar-border flex items-center justify-between">
             <div>
@@ -81,7 +81,7 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
           </div>
         </aside>
       ) : (
-        <aside className="w-16 bg-sidebar border-r border-sidebar-border flex flex-col">
+        <aside className="hidden md:flex md:w-16 bg-sidebar border-r border-sidebar-border flex-col">
           {/* Collapsed Header with Expand Button */}
           <div className="p-3 border-b border-sidebar-border space-y-2">
             <Button
@@ -135,7 +135,29 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">{children}</main>
+      <main className="flex-1 flex flex-col overflow-hidden w-full">{children}</main>
+      
+      {/* Mobile Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-sidebar border-t border-sidebar-border flex items-center justify-around py-2 z-50">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${
+                isActive
+                  ? "text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground/70"
+              }`}
+            >
+              <Icon className={`w-5 h-5 ${isActive ? "text-primary" : ""}`} />
+              <span className="text-xs font-medium">{tab.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 };

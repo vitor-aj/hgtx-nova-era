@@ -50,8 +50,8 @@ export const ChatHeader = ({
   };
 
   return (
-    <header className="border-b border-border bg-card/50 backdrop-blur-sm px-6 py-4 flex items-center justify-between">
-      <div className="flex items-center gap-4">
+    <header className="border-b border-border bg-card/50 backdrop-blur-sm px-3 md:px-6 py-3 md:py-4 flex items-center justify-between">
+      <div className="flex items-center gap-2 md:gap-4">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-primary animate-pulse-glow" />
           <span className="text-sm text-muted-foreground">Online</span>
@@ -60,9 +60,9 @@ export const ChatHeader = ({
         {showModelSelector && onModelChange && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2 glass-effect">
-                <span className="font-medium">{selectedModel}</span>
-                <ChevronDown className="w-4 h-4" />
+              <Button variant="outline" className="gap-1 md:gap-2 glass-effect text-xs md:text-sm">
+                <span className="font-medium truncate max-w-[80px] md:max-w-none">{selectedModel}</span>
+                <ChevronDown className="w-3 h-3 md:w-4 md:h-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="glass-effect bg-popover border-border z-50">
@@ -84,11 +84,11 @@ export const ChatHeader = ({
             <DialogTrigger asChild>
               <Button
                 variant="outline"
-                className="gap-2 glass-effect"
+                className="gap-1 md:gap-2 glass-effect text-xs md:text-sm"
                 onClick={() => setTempSystemPrompt(systemPrompt)}
               >
-                <UserCog className="w-4 h-4" />
-                <span className="font-medium">Personalidade</span>
+                <UserCog className="w-3 h-3 md:w-4 md:h-4" />
+                <span className="hidden md:inline font-medium">Personalidade</span>
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -120,7 +120,7 @@ export const ChatHeader = ({
         )}
       </div>
 
-      <div className="text-sm text-muted-foreground">
+      <div className="hidden md:block text-sm text-muted-foreground">
         {showModelSelector ? "Modelo de linguagem avançado" : "Sistema HGTX Codex"}
       </div>
     </header>
