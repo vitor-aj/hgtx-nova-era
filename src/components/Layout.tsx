@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageSquare, Image, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight, Bot, Sparkles } from "lucide-react";
+import { MessageSquare, Image, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight, Bot, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -20,7 +20,7 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
     { id: "images" as TabType, label: "Imagens", icon: Image },
     { id: "audio" as TabType, label: "Áudio", icon: Mic },
     { id: "bots" as TabType, label: "Bots", icon: Bot },
-    { id: "agent" as TabType, label: "Agente de Parecer", icon: Sparkles },
+    { id: "agent" as TabType, label: "Agente de Parecer", icon: Brain },
   ];
 
   return (
