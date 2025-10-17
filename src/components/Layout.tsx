@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageSquare, Image, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight, Bot, Brain } from "lucide-react";
+import { MessageSquare, Image, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight, Bot, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -20,7 +20,7 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
     { id: "images" as TabType, label: "Imagens", icon: Image },
     { id: "audio" as TabType, label: "Áudio", icon: Mic },
     { id: "bots" as TabType, label: "Bots", icon: Bot },
-    { id: "agent" as TabType, label: "Agente de Parecer", icon: Brain },
+    { id: "agent" as TabType, label: "Agente de Parecer", icon: FileText },
   ];
 
   return (
@@ -46,40 +46,40 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
 
           {/* Navigation Tabs */}
           <nav className="flex-1 px-3 py-2 space-y-1">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => onTabChange(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground cyber-border"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="font-medium">{tab.label}</span>
-              </button>
-            );
-          })}
-        </nav>
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground cyber-border"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="font-medium">{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
 
-        <Separator className="bg-sidebar-border" />
+          <Separator className="bg-sidebar-border" />
 
-        {/* Settings & Theme */}
-        <div className="p-4 border-t border-sidebar-border space-y-2">
-          <div className="flex items-center justify-between px-3">
-            <span className="text-sm font-medium text-sidebar-foreground">Tema</span>
-            <ThemeToggle />
+          {/* Settings & Theme */}
+          <div className="p-4 border-t border-sidebar-border space-y-2">
+            <div className="flex items-center justify-between px-3">
+              <span className="text-sm font-medium text-sidebar-foreground">Tema</span>
+              <ThemeToggle />
+            </div>
+            <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground">
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
+            </Button>
           </div>
-          <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground">
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Button>
-        </div>
-      </aside>
+        </aside>
       ) : (
         <aside className="w-16 bg-sidebar border-r border-sidebar-border flex flex-col">
           {/* Collapsed Header with Expand Button */}
@@ -127,12 +127,7 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
           {/* Theme & Settings Icons */}
           <div className="p-3 border-t border-sidebar-border space-y-2">
             <ThemeToggle />
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="w-full text-sidebar-foreground"
-              title="Voltar"
-            >
+            <Button variant="ghost" size="icon" className="w-full text-sidebar-foreground" title="Voltar">
               <ArrowLeft className="w-4 h-4" />
             </Button>
           </div>
@@ -140,9 +135,7 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {children}
-      </main>
+      <main className="flex-1 flex flex-col overflow-hidden">{children}</main>
     </div>
   );
 };
