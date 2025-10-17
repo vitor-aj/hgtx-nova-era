@@ -3,6 +3,15 @@ import { Search, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { LegalOpinion } from "./AgentView";
 
 interface AgentSearchProps {
@@ -51,6 +60,8 @@ const mockOpinionsDatabase: LegalOpinion[] = [
 export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<LegalOpinion[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const handleSearch = () => {
     if (!searchTerm.trim()) {
@@ -66,7 +77,12 @@ export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
     );
 
     setSearchResults(results);
+    setCurrentPage(1);
   };
+
+  const totalPages = Math.ceil(searchResults.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedResults = searchResults.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -89,41 +105,103 @@ export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
         </p>
       </div>
 
-      <ScrollArea className="flex-1 p-6">
-        {searchResults.length > 0 ? (
-          <div className="space-y-3">
-            {searchResults.map((opinion) => (
-              <div
-                key={opinion.id}
-                className="p-4 border border-border rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
-                onClick={() => onSelectOpinion(opinion)}
-              >
-                <div className="flex items-start gap-3">
-                  <FileText className="w-5 h-5 text-primary mt-1" />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">{opinion.title}</h3>
-                    <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
-                      <span>{opinion.category}</span>
-                      <span>{new Date(opinion.createdAt).toLocaleDateString('pt-BR')}</span>
+      <div className="flex-1 flex flex-col">
+        <ScrollArea className="flex-1 p-6">
+          {searchResults.length > 0 ? (
+            <div className="space-y-3">
+              {paginatedResults.map((opinion) => (
+                <div
+                  key={opinion.id}
+                  className="p-4 border border-border rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
+                  onClick={() => onSelectOpinion(opinion)}
+                >
+                  <div className="flex items-start gap-3">
+                    <FileText className="w-5 h-5 text-primary mt-1" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-foreground">{opinion.title}</h3>
+                      <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
+                        <span>{opinion.category}</span>
+                        <span>{new Date(opinion.createdAt).toLocaleDateString('pt-BR')}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                        {opinion.content}
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                      {opinion.content}
-                    </p>
                   </div>
                 </div>
+              ))}
+            </div>
+          ) : searchTerm ? (
+            <div className="text-center text-muted-foreground py-12">
+              <p>Nenhum parecer encontrado para "{searchTerm}"</p>
+            </div>
+          ) : (
+            <div className="text-center text-muted-foreground py-12">
+              <p>Digite um termo para pesquisar na base de pareceres</p>
+            </div>
+          )}
+        </ScrollArea>
+
+        {searchResults.length > 0 && (
+          <div className="p-4 border-t border-border space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Itens por página:</span>
+                <Select
+                  value={itemsPerPage.toString()}
+                  onValueChange={(value) => {
+                    setItemsPerPage(Number(value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-20">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            ))}
-          </div>
-        ) : searchTerm ? (
-          <div className="text-center text-muted-foreground py-12">
-            <p>Nenhum parecer encontrado para "{searchTerm}"</p>
-          </div>
-        ) : (
-          <div className="text-center text-muted-foreground py-12">
-            <p>Digite um termo para pesquisar na base de pareceres</p>
+              <span className="text-sm text-muted-foreground">
+                Mostrando {startIndex + 1}-{Math.min(startIndex + itemsPerPage, searchResults.length)} de {searchResults.length}
+              </span>
+            </div>
+
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => setCurrentPage(page)}
+                      isActive={currentPage === page}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
-      </ScrollArea>
+      </div>
     </div>
   );
 };
