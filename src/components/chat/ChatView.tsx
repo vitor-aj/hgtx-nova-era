@@ -25,8 +25,115 @@ export const ChatView = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
+      role: "user",
+      content: "Como posso criar uma função em Python que calcula o fatorial de um número?",
+    },
+    {
+      id: "2",
       role: "assistant",
-      content: "Olá! Sou o assistente HGTX Codex. Como posso ajudá-lo hoje?",
+      content: `Claro! Vou te mostrar **duas formas** de criar uma função para calcular o fatorial:
+
+## 1. Versão Iterativa
+
+\`\`\`python
+def fatorial_iterativo(n):
+    if n < 0:
+        return None
+    resultado = 1
+    for i in range(1, n + 1):
+        resultado *= i
+    return resultado
+
+# Exemplo de uso
+print(fatorial_iterativo(5))  # Saída: 120
+\`\`\`
+
+## 2. Versão Recursiva
+
+\`\`\`python
+def fatorial_recursivo(n):
+    if n < 0:
+        return None
+    if n == 0 or n == 1:
+        return 1
+    return n * fatorial_recursivo(n - 1)
+
+# Exemplo de uso
+print(fatorial_recursivo(5))  # Saída: 120
+\`\`\`
+
+### Principais diferenças:
+
+- **Iterativa**: Usa um loop \`for\`, mais eficiente em termos de memória
+- **Recursiva**: Mais elegante, mas pode causar *stack overflow* para números grandes
+
+> 💡 **Dica**: Para valores grandes, prefira a versão iterativa ou use \`math.factorial()\`
+
+Você também pode importar direto do módulo \`math\`:
+
+\`\`\`python
+import math
+resultado = math.factorial(5)
+\`\`\``,
+      model: "ChatGPT 4.1",
+    },
+    {
+      id: "3",
+      role: "user",
+      content: "E como ficaria em JavaScript?",
+    },
+    {
+      id: "4",
+      role: "assistant",
+      content: `Em **JavaScript**, ficaria bem similar! Aqui estão as duas versões:
+
+## Versão com Arrow Function
+
+\`\`\`javascript
+const fatorial = (n) => {
+  if (n < 0) return null;
+  if (n === 0 || n === 1) return 1;
+  
+  let resultado = 1;
+  for (let i = 2; i <= n; i++) {
+    resultado *= i;
+  }
+  return resultado;
+};
+
+console.log(fatorial(5)); // 120
+\`\`\`
+
+## Versão Recursiva
+
+\`\`\`javascript
+const fatorialRecursivo = (n) => {
+  if (n < 0) return null;
+  if (n === 0 || n === 1) return 1;
+  return n * fatorialRecursivo(n - 1);
+};
+
+console.log(fatorialRecursivo(5)); // 120
+\`\`\`
+
+### Características do JavaScript:
+
+1. Usa \`const\` para declarar funções
+2. Arrow functions (\`=>\`) são mais concisas
+3. Operador \`===\` para comparação estrita
+4. \`let\` para variáveis que mudam de valor
+
+Você também pode usar **reduce** para uma solução funcional:
+
+\`\`\`javascript
+const fatorialFuncional = (n) => 
+  n < 0 ? null : 
+  [...Array(n).keys()]
+    .map(i => i + 1)
+    .reduce((acc, val) => acc * val, 1);
+\`\`\`
+
+Qual versão você prefere? 🚀`,
       model: "ChatGPT 4.1",
     },
   ]);
