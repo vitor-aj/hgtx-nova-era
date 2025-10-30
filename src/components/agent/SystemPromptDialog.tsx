@@ -39,7 +39,7 @@ export const SystemPromptDialog = ({ open, onOpenChange }: SystemPromptDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>System Prompts</DialogTitle>
           <DialogDescription>
@@ -52,11 +52,14 @@ export const SystemPromptDialog = ({ open, onOpenChange }: SystemPromptDialogPro
             <Label htmlFor="agent1-prompt" className="text-base font-semibold">
               Prompt do Agente 1
             </Label>
+            <p className="text-sm text-muted-foreground">
+              Agente especialista em elaboração de parecer jurídico, responsável por desenvolver a estrutura completa e fundamentada do documento legal
+            </p>
             <Textarea
               id="agent1-prompt"
               value={agent1Prompt}
               onChange={(e) => setAgent1Prompt(e.target.value)}
-              className="min-h-[150px] font-mono text-sm"
+              className="min-h-[300px] font-mono text-sm"
               placeholder="Digite o prompt do primeiro agente..."
             />
           </div>
@@ -65,11 +68,14 @@ export const SystemPromptDialog = ({ open, onOpenChange }: SystemPromptDialogPro
             <Label htmlFor="agent2-prompt" className="text-base font-semibold">
               Prompt do Agente 2
             </Label>
+            <p className="text-sm text-muted-foreground">
+              Agente especialista em revisão e aprimoramento de parecer jurídico, focado em validar argumentos e refinar a qualidade técnica
+            </p>
             <Textarea
               id="agent2-prompt"
               value={agent2Prompt}
               onChange={(e) => setAgent2Prompt(e.target.value)}
-              className="min-h-[150px] font-mono text-sm"
+              className="min-h-[300px] font-mono text-sm"
               placeholder="Digite o prompt do segundo agente..."
             />
           </div>
