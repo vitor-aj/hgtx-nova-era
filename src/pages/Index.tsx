@@ -8,6 +8,7 @@ import { BotView } from "@/components/bots/BotView";
 import { BotChat } from "@/components/bots/BotChat";
 import { AgentView } from "@/components/agent/AgentView";
 import { CreditsView } from "@/components/credits/CreditsView";
+import { AddCreditsView } from "@/components/credits/AddCreditsView";
 
 interface Bot {
   id: string;
@@ -19,6 +20,7 @@ interface Bot {
 const Index = () => {
   const [activeView, setActiveView] = useState<"chat" | "images" | "transcription" | "generation" | "bots" | "agent" | "credits">("chat");
   const [activeBotChat, setActiveBotChat] = useState<Bot | null>(null);
+  const [isAddingCredits, setIsAddingCredits] = useState(false);
 
   const handleStartBotChat = (bot: Bot) => {
     setActiveBotChat(bot);
@@ -42,7 +44,13 @@ const Index = () => {
         )
       )}
       {activeView === "agent" && <AgentView />}
-      {activeView === "credits" && <CreditsView />}
+      {activeView === "credits" && (
+        isAddingCredits ? (
+          <AddCreditsView onBack={() => setIsAddingCredits(false)} />
+        ) : (
+          <CreditsView onAddCredits={() => setIsAddingCredits(true)} />
+        )
+      )}
     </Layout>
   );
 };

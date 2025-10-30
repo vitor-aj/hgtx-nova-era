@@ -6,7 +6,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Plus, Zap, DollarSign, Activity, TrendingUp } from "lucide-react";
-import { AddCreditsDialog } from "./AddCreditsDialog";
 import { PeriodFilter } from "./PeriodFilter";
 import { subDays, subYears, isAfter, isBefore, isToday, startOfDay, endOfDay } from "date-fns";
 
@@ -50,8 +49,11 @@ const chartConfig = {
   },
 };
 
-export const CreditsView = () => {
-  const [isAddCreditsOpen, setIsAddCreditsOpen] = useState(false);
+interface CreditsViewProps {
+  onAddCredits: () => void;
+}
+
+export const CreditsView = ({ onAddCredits }: CreditsViewProps) => {
   const [filterType, setFilterType] = useState<string>("30days");
   const [filterStartDate, setFilterStartDate] = useState<Date | undefined>();
   const [filterEndDate, setFilterEndDate] = useState<Date | undefined>();
@@ -118,7 +120,7 @@ export const CreditsView = () => {
             </p>
           </div>
           <Button
-            onClick={() => setIsAddCreditsOpen(true)}
+            onClick={onAddCredits}
             className="cyber-glow gap-2"
           >
             <Plus className="w-4 h-4" />
@@ -362,12 +364,6 @@ export const CreditsView = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Add Credits Dialog */}
-      <AddCreditsDialog
-        open={isAddCreditsOpen}
-        onOpenChange={setIsAddCreditsOpen}
-      />
     </div>
   );
 };
