@@ -9,6 +9,7 @@ import { BotChat } from "@/components/bots/BotChat";
 import { AgentView } from "@/components/agent/AgentView";
 import { CreditsView } from "@/components/credits/CreditsView";
 import { AddCreditsView } from "@/components/credits/AddCreditsView";
+import { ManagePaymentsView } from "@/components/credits/ManagePaymentsView";
 
 interface Bot {
   id: string;
@@ -21,6 +22,7 @@ const Index = () => {
   const [activeView, setActiveView] = useState<"chat" | "images" | "transcription" | "generation" | "bots" | "agent" | "credits">("chat");
   const [activeBotChat, setActiveBotChat] = useState<Bot | null>(null);
   const [isAddingCredits, setIsAddingCredits] = useState(false);
+  const [isManagingPayments, setIsManagingPayments] = useState(false);
 
   const handleStartBotChat = (bot: Bot) => {
     setActiveBotChat(bot);
@@ -44,12 +46,17 @@ const Index = () => {
         )
       )}
       {activeView === "agent" && <AgentView />}
-      {activeView === "credits" && (
-        isAddingCredits ? (
-          <AddCreditsView onBack={() => setIsAddingCredits(false)} />
-        ) : (
-          <CreditsView onAddCredits={() => setIsAddingCredits(true)} />
-        )
+      {activeView === "credits" && !isAddingCredits && !isManagingPayments && (
+        <CreditsView 
+          onAddCredits={() => setIsAddingCredits(true)} 
+          onManagePayments={() => setIsManagingPayments(true)}
+        />
+      )}
+      {activeView === "credits" && isAddingCredits && (
+        <AddCreditsView onBack={() => setIsAddingCredits(false)} />
+      )}
+      {activeView === "credits" && isManagingPayments && (
+        <ManagePaymentsView onBack={() => setIsManagingPayments(false)} />
       )}
     </Layout>
   );

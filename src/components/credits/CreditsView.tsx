@@ -51,9 +51,10 @@ const chartConfig = {
 
 interface CreditsViewProps {
   onAddCredits: () => void;
+  onManagePayments: () => void;
 }
 
-export const CreditsView = ({ onAddCredits }: CreditsViewProps) => {
+export const CreditsView = ({ onAddCredits, onManagePayments }: CreditsViewProps) => {
   const [filterType, setFilterType] = useState<string>("30days");
   const [filterStartDate, setFilterStartDate] = useState<Date | undefined>();
   const [filterEndDate, setFilterEndDate] = useState<Date | undefined>();
@@ -119,13 +120,22 @@ export const CreditsView = ({ onAddCredits }: CreditsViewProps) => {
               Acompanhe seu consumo e gerencie seus créditos
             </p>
           </div>
-          <Button
-            onClick={onAddCredits}
-            className="cyber-glow gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Adicionar Créditos
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={onManagePayments}
+              variant="outline"
+              className="gap-2"
+            >
+              Gerenciar
+            </Button>
+            <Button
+              onClick={onAddCredits}
+              className="cyber-glow gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar Créditos
+            </Button>
+          </div>
         </div>
         
         <div className="flex justify-end">
