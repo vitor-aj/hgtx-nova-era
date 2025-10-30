@@ -281,37 +281,27 @@ export const CreditsView = () => {
       </Card>
 
       {/* Info Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="glass-effect border-border/50">
-          <CardContent className="p-6 space-y-2">
-            <div className="text-3xl">💡</div>
-            <h3 className="font-semibold text-base">Sobre o Codex</h3>
+      <Card className="glass-effect border-border/50">
+        <CardContent className="p-6 space-y-4">
+          <div className="space-y-2">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              A API Codex da OpenAI transforma linguagem natural em código, permitindo automação e geração inteligente de código em múltiplas linguagens.
+              💡 <span className="font-medium text-foreground">Sobre o Codex:</span> A API Codex da OpenAI transforma linguagem natural em código, permitindo automação e geração inteligente de código em múltiplas linguagens.
             </p>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card className="glass-effect border-border/50">
-          <CardContent className="p-6 space-y-2">
-            <div className="text-3xl">⚡</div>
-            <h3 className="font-semibold text-base">Custos</h3>
+          <div className="space-y-2">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Os valores são calculados com base no número de tokens processados. Monitoramento ativo ajuda a evitar gastos inesperados.
+              ⚡ <span className="font-medium text-foreground">Custos:</span> Os valores são calculados com base no número de tokens processados. Monitoramento ativo ajuda a evitar gastos inesperados.
             </p>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card className="glass-effect border-border/50">
-          <CardContent className="p-6 space-y-2">
-            <div className="text-3xl">🔔</div>
-            <h3 className="font-semibold text-base">Alertas</h3>
+          <div className="space-y-2">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Você será notificado automaticamente ao atingir 75%, 90% e 100% do limite configurado.
+              🔔 <span className="font-medium text-foreground">Alertas:</span> Você será notificado automaticamente ao atingir 75%, 90% e 100% do limite configurado.
             </p>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Add Credits Dialog */}
       <AddCreditsDialog
