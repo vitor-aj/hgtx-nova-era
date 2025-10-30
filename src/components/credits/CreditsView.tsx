@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -8,15 +8,20 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Plus, Zap, DollarSign, Activity, TrendingUp } from "lucide-react";
 import { AddCreditsDialog } from "./AddCreditsDialog";
 import { PeriodFilter } from "./PeriodFilter";
+import { subDays, subYears, isAfter, isBefore, isToday, startOfDay, endOfDay } from "date-fns";
 
-// Mock data
+// Mock data com datas
 const mockConsumptionData = [
-  { month: "Jan", requisicoes: 1200, tokens: 450000, custo: 45.5 },
-  { month: "Fev", requisicoes: 1500, tokens: 520000, custo: 52.3 },
-  { month: "Mar", requisicoes: 1800, tokens: 680000, custo: 68.9 },
-  { month: "Abr", requisicoes: 2100, tokens: 750000, custo: 75.2 },
-  { month: "Mai", requisicoes: 2400, tokens: 820000, custo: 82.5 },
-  { month: "Jun", requisicoes: 2800, tokens: 950000, custo: 95.8 },
+  { month: "Jan", date: new Date(2025, 0, 1), requisicoes: 1200, tokens: 450000, custo: 45.5 },
+  { month: "Fev", date: new Date(2025, 1, 1), requisicoes: 1500, tokens: 520000, custo: 52.3 },
+  { month: "Mar", date: new Date(2025, 2, 1), requisicoes: 1800, tokens: 680000, custo: 68.9 },
+  { month: "Abr", date: new Date(2025, 3, 1), requisicoes: 2100, tokens: 750000, custo: 75.2 },
+  { month: "Mai", date: new Date(2025, 4, 1), requisicoes: 2400, tokens: 820000, custo: 82.5 },
+  { month: "Jun", date: new Date(2025, 5, 1), requisicoes: 2800, tokens: 950000, custo: 95.8 },
+  { month: "Jul", date: new Date(2025, 6, 1), requisicoes: 3100, tokens: 1050000, custo: 105.2 },
+  { month: "Ago", date: new Date(2025, 7, 1), requisicoes: 2900, tokens: 980000, custo: 98.5 },
+  { month: "Set", date: new Date(2025, 8, 1), requisicoes: 3200, tokens: 1120000, custo: 112.8 },
+  { month: "Out", date: new Date(2025, 9, 1), requisicoes: 3500, tokens: 1250000, custo: 125.3 },
 ];
 
 const mockTopUsers = [
@@ -47,15 +52,57 @@ const chartConfig = {
 
 export const CreditsView = () => {
   const [isAddCreditsOpen, setIsAddCreditsOpen] = useState(false);
+  const [filterType, setFilterType] = useState<string>("none");
+  const [filterStartDate, setFilterStartDate] = useState<Date | undefined>();
+  const [filterEndDate, setFilterEndDate] = useState<Date | undefined>();
 
-  // Mock current stats
-  const currentStats = {
-    requisicoes: 2800,
-    tokensProcessados: 950000,
-    custoTotal: 95.8,
-    limiteAtual: 95.8,
-    limiteMaximo: 200,
+  // Função para verificar se uma data está dentro do período filtrado
+  const isDateInRange = (date: Date) => {
+    const today = new Date();
+    
+    switch (filterType) {
+      case "today":
+        return isToday(date);
+      case "7days":
+        return isAfter(date, subDays(today, 7)) && isBefore(date, today);
+      case "30days":
+        return isAfter(date, subDays(today, 30)) && isBefore(date, today);
+      case "year":
+        return isAfter(date, subYears(today, 1)) && isBefore(date, today);
+      case "custom":
+        if (!filterStartDate || !filterEndDate) return true;
+        return (
+          isAfter(date, startOfDay(filterStartDate)) && 
+          isBefore(date, endOfDay(filterEndDate))
+        );
+      default:
+        return true;
+    }
   };
+
+  // Filtrar dados do gráfico
+  const filteredConsumptionData = useMemo(() => {
+    if (filterType === "none") return mockConsumptionData;
+    return mockConsumptionData.filter(item => isDateInRange(item.date));
+  }, [filterType, filterStartDate, filterEndDate]);
+
+  // Calcular estatísticas baseadas nos dados filtrados
+  const currentStats = useMemo(() => {
+    const stats = filteredConsumptionData.reduce(
+      (acc, item) => ({
+        requisicoes: acc.requisicoes + item.requisicoes,
+        tokensProcessados: acc.tokensProcessados + item.tokens,
+        custoTotal: acc.custoTotal + item.custo,
+      }),
+      { requisicoes: 0, tokensProcessados: 0, custoTotal: 0 }
+    );
+
+    return {
+      ...stats,
+      limiteAtual: stats.custoTotal,
+      limiteMaximo: 200,
+    };
+  }, [filteredConsumptionData]);
 
   const percentualLimite = (currentStats.limiteAtual / currentStats.limiteMaximo) * 100;
 
@@ -82,8 +129,9 @@ export const CreditsView = () => {
         <div className="flex justify-end">
           <PeriodFilter
             onFilterChange={(filter, startDate, endDate) => {
-              console.log("Filter changed:", filter, startDate, endDate);
-              // Aqui você pode implementar a lógica de filtro
+              setFilterType(filter);
+              setFilterStartDate(startDate);
+              setFilterEndDate(endDate);
             }}
           />
         </div>
@@ -175,7 +223,7 @@ export const CreditsView = () => {
         <CardContent>
           <ChartContainer config={chartConfig} className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockConsumptionData}>
+              <LineChart data={filteredConsumptionData}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis
                   dataKey="month"
