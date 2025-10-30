@@ -280,6 +280,39 @@ export const CreditsView = () => {
         </CardContent>
       </Card>
 
+      {/* Info Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="glass-effect border-border/50">
+          <CardContent className="p-6 space-y-2">
+            <div className="text-3xl">💡</div>
+            <h3 className="font-semibold text-base">Sobre o Codex</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              A API Codex da OpenAI transforma linguagem natural em código, permitindo automação e geração inteligente de código em múltiplas linguagens.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-effect border-border/50">
+          <CardContent className="p-6 space-y-2">
+            <div className="text-3xl">⚡</div>
+            <h3 className="font-semibold text-base">Custos</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Os valores são calculados com base no número de tokens processados. Monitoramento ativo ajuda a evitar gastos inesperados.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-effect border-border/50">
+          <CardContent className="p-6 space-y-2">
+            <div className="text-3xl">🔔</div>
+            <h3 className="font-semibold text-base">Alertas</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Você será notificado automaticamente ao atingir 75%, 90% e 100% do limite configurado.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Add Credits Dialog */}
       <AddCreditsDialog
         open={isAddCreditsOpen}
