@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { MessageSquare, Image, AudioLines, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight, Bot, Brain } from "lucide-react";
+import { MessageSquare, Image, AudioLines, Mic, ArrowLeft, Plus, ChevronLeft, ChevronRight, Bot, Brain, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface LayoutProps {
   children: React.ReactNode;
-  activeTab: "chat" | "images" | "transcription" | "generation" | "bots" | "agent";
-  onTabChange: (tab: "chat" | "images" | "transcription" | "generation" | "bots" | "agent") => void;
+  activeTab: "chat" | "images" | "transcription" | "generation" | "bots" | "agent" | "credits";
+  onTabChange: (tab: "chat" | "images" | "transcription" | "generation" | "bots" | "agent" | "credits") => void;
 }
 
-type TabType = "chat" | "images" | "transcription" | "generation" | "bots" | "agent";
+type TabType = "chat" | "images" | "transcription" | "generation" | "bots" | "agent" | "credits";
 
 export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -22,6 +22,7 @@ export const Layout = ({ children, activeTab, onTabChange }: LayoutProps) => {
     { id: "generation" as TabType, label: "Geração de Áudio", icon: Mic },
     { id: "bots" as TabType, label: "Bots", icon: Bot },
     { id: "agent" as TabType, label: "Agente de Parecer", icon: Brain },
+    { id: "credits" as TabType, label: "Créditos", icon: CreditCard },
   ];
 
   return (

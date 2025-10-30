@@ -7,6 +7,7 @@ import { GenerationView } from "@/components/audio/GenerationView";
 import { BotView } from "@/components/bots/BotView";
 import { BotChat } from "@/components/bots/BotChat";
 import { AgentView } from "@/components/agent/AgentView";
+import { CreditsView } from "@/components/credits/CreditsView";
 
 interface Bot {
   id: string;
@@ -16,7 +17,7 @@ interface Bot {
 }
 
 const Index = () => {
-  const [activeView, setActiveView] = useState<"chat" | "images" | "transcription" | "generation" | "bots" | "agent">("chat");
+  const [activeView, setActiveView] = useState<"chat" | "images" | "transcription" | "generation" | "bots" | "agent" | "credits">("chat");
   const [activeBotChat, setActiveBotChat] = useState<Bot | null>(null);
 
   const handleStartBotChat = (bot: Bot) => {
@@ -41,6 +42,7 @@ const Index = () => {
         )
       )}
       {activeView === "agent" && <AgentView />}
+      {activeView === "credits" && <CreditsView />}
     </Layout>
   );
 };
