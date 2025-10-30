@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Search, FileText } from "lucide-react";
+import { useState, useRef } from "react";
+import { Search, FileText, Upload, X, File } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,6 +13,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { LegalOpinion } from "./AgentView";
+import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface AgentSearchProps {
   onSelectOpinion: (opinion: LegalOpinion) => void;
@@ -62,6 +64,50 @@ export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
   const [searchResults, setSearchResults] = useState<LegalOpinion[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    const validFiles: File[] = [];
+    const invalidFiles: string[] = [];
+
+    Array.from(files).forEach((file) => {
+      const extension = file.name.split(".").pop()?.toLowerCase();
+      if (extension === "pdf" || extension === "docx") {
+        validFiles.push(file);
+      } else {
+        invalidFiles.push(file.name);
+      }
+    });
+
+    if (invalidFiles.length > 0) {
+      toast({
+        title: "Arquivos não suportados",
+        description: `Apenas arquivos PDF e DOCX são permitidos. Rejeitados: ${invalidFiles.join(", ")}`,
+        variant: "destructive",
+      });
+    }
+
+    if (validFiles.length > 0) {
+      setUploadedFiles([...uploadedFiles, ...validFiles]);
+      toast({
+        title: "Arquivos adicionados",
+        description: `${validFiles.length} arquivo(s) adicionado(s) com sucesso.`,
+      });
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
+  };
 
   const handleSearch = () => {
     if (!searchTerm.trim()) {
@@ -87,22 +133,89 @@ export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
   return (
     <div className="flex flex-col h-full bg-background">
       <div className="p-6 border-b border-border space-y-4">
-        <h2 className="text-2xl font-bold text-foreground">Pesquisar Base de Pareceres</h2>
-        <div className="flex gap-2">
-          <Input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Digite título, frase ou categoria..."
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          />
-          <Button onClick={handleSearch} className="gap-2">
-            <Search className="w-4 h-4" />
-            Buscar
-          </Button>
+        <h2 className="text-2xl font-bold text-foreground">Base de Pareceres</h2>
+        
+        {/* Upload Section */}
+        <Card className="glass-effect border-border/50">
+          <CardContent className="p-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground">Upload de Documentos</h3>
+                  <p className="text-sm text-muted-foreground">Apenas arquivos PDF e DOCX</p>
+                </div>
+                <Button
+                  onClick={() => fileInputRef.current?.click()}
+                  variant="outline"
+                  className="gap-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  Selecionar Arquivos
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.docx"
+                  multiple
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+
+              {uploadedFiles.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-foreground">
+                    Arquivos carregados ({uploadedFiles.length})
+                  </p>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {uploadedFiles.map((file, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-2 rounded-lg bg-muted/50 border border-border"
+                      >
+                        <div className="flex items-center gap-2">
+                          <File className="w-4 h-4 text-primary" />
+                          <span className="text-sm truncate max-w-xs">{file.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            ({(file.size / 1024).toFixed(1)} KB)
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveFile(index)}
+                          className="h-7 w-7 text-destructive hover:text-destructive"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Search Section */}
+        <div className="space-y-2">
+          <h3 className="font-semibold text-foreground">Pesquisar na Base</h3>
+          <div className="flex gap-2">
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Digite título, frase ou categoria..."
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            <Button onClick={handleSearch} className="gap-2">
+              <Search className="w-4 h-4" />
+              Buscar
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Base com {mockOpinionsDatabase.length} pareceres disponíveis
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Base com {mockOpinionsDatabase.length} pareceres disponíveis
-        </p>
       </div>
 
       <div className="flex-1 flex flex-col">
