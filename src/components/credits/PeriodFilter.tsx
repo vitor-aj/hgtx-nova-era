@@ -19,7 +19,7 @@ interface PeriodFilterProps {
 
 export const PeriodFilter = ({ onFilterChange }: PeriodFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<FilterOption>("none");
+  const [selectedFilter, setSelectedFilter] = useState<FilterOption>("30days");
   const [showCustomDates, setShowCustomDates] = useState(false);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();

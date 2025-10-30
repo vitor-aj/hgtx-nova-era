@@ -52,7 +52,7 @@ const chartConfig = {
 
 export const CreditsView = () => {
   const [isAddCreditsOpen, setIsAddCreditsOpen] = useState(false);
-  const [filterType, setFilterType] = useState<string>("none");
+  const [filterType, setFilterType] = useState<string>("30days");
   const [filterStartDate, setFilterStartDate] = useState<Date | undefined>();
   const [filterEndDate, setFilterEndDate] = useState<Date | undefined>();
 
