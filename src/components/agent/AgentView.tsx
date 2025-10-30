@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Eye, Trash2, ArrowUpDown } from "lucide-react";
+import { Plus, Search, Eye, Trash2, ArrowUpDown, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { OpinionDialog } from "./OpinionDialog";
 import { AgentSearch } from "./AgentSearch";
+import { SystemPromptDialog } from "./SystemPromptDialog";
 
 export interface LegalOpinion {
   id: string;
@@ -41,6 +42,7 @@ export const AgentView = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedOpinion, setSelectedOpinion] = useState<LegalOpinion | null>(null);
   const [showSearch, setShowSearch] = useState(false);
+  const [isSystemPromptOpen, setIsSystemPromptOpen] = useState(false);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -118,6 +120,11 @@ export const AgentView = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-4">
           <h1 className="text-xl md:text-3xl font-bold text-foreground">Agente de Parecer Jurídico</h1>
           <div className="flex gap-2 w-full md:w-auto">
+            <Button onClick={() => setIsSystemPromptOpen(true)} variant="outline" className="gap-1 md:gap-2 flex-1 md:flex-none text-xs md:text-sm">
+              <Settings className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">System Prompt</span>
+              <span className="sm:hidden">Prompt</span>
+            </Button>
             <Button onClick={() => setShowSearch(true)} variant="outline" className="gap-1 md:gap-2 flex-1 md:flex-none text-xs md:text-sm">
               <Search className="w-3 h-3 md:w-4 md:h-4" />
               <span className="hidden sm:inline">Pesquisar Base</span>
@@ -306,6 +313,11 @@ export const AgentView = () => {
         onOpenChange={setIsDialogOpen}
         selectedOpinion={selectedOpinion}
         onOpinionCreated={handleOpinionCreated}
+      />
+      
+      <SystemPromptDialog
+        open={isSystemPromptOpen}
+        onOpenChange={setIsSystemPromptOpen}
       />
     </div>
   );
