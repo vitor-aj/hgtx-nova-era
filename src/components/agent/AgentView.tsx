@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Eye, Trash2, ArrowUpDown, Settings } from "lucide-react";
+import { Plus, Search, Eye, Trash2, ArrowUpDown, Settings, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,6 +20,7 @@ import {
 import { OpinionDialog } from "./OpinionDialog";
 import { AgentSearch } from "./AgentSearch";
 import { SystemPromptDialog } from "./SystemPromptDialog";
+import { CategoriesDialog, Category } from "./CategoriesDialog";
 
 export interface LegalOpinion {
   id: string;
@@ -43,6 +44,14 @@ export const AgentView = () => {
   const [selectedOpinion, setSelectedOpinion] = useState<LegalOpinion | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [isSystemPromptOpen, setIsSystemPromptOpen] = useState(false);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([
+    { id: "cat-1", name: "Direito Civil" },
+    { id: "cat-2", name: "Direito Trabalhista" },
+    { id: "cat-3", name: "Direito Empresarial" },
+    { id: "cat-4", name: "Direito do Consumidor" },
+    { id: "cat-5", name: "Direito Tributário" },
+  ]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -109,7 +118,7 @@ export const AgentView = () => {
             Voltar para Pareceres
           </Button>
         </div>
-        <AgentSearch onSelectOpinion={handleSelectFromSearch} />
+        <AgentSearch onSelectOpinion={handleSelectFromSearch} categories={categories} />
       </div>
     );
   }
@@ -119,11 +128,16 @@ export const AgentView = () => {
       <div className="p-3 md:p-6 border-b border-border">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-4">
           <h1 className="text-xl md:text-3xl font-bold text-foreground">Agente de Parecer Jurídico</h1>
-          <div className="flex gap-2 w-full md:w-auto">
+          <div className="flex gap-2 w-full md:w-auto flex-wrap">
             <Button onClick={() => setIsSystemPromptOpen(true)} variant="outline" className="gap-1 md:gap-2 flex-1 md:flex-none text-xs md:text-sm">
               <Settings className="w-3 h-3 md:w-4 md:h-4" />
               <span className="hidden sm:inline">System Prompt</span>
               <span className="sm:hidden">Prompt</span>
+            </Button>
+            <Button onClick={() => setIsCategoriesOpen(true)} variant="outline" className="gap-1 md:gap-2 flex-1 md:flex-none text-xs md:text-sm">
+              <FolderOpen className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Categorias</span>
+              <span className="sm:hidden">Cats</span>
             </Button>
             <Button onClick={() => setShowSearch(true)} variant="outline" className="gap-1 md:gap-2 flex-1 md:flex-none text-xs md:text-sm">
               <Search className="w-3 h-3 md:w-4 md:h-4" />
@@ -313,11 +327,19 @@ export const AgentView = () => {
         onOpenChange={setIsDialogOpen}
         selectedOpinion={selectedOpinion}
         onOpinionCreated={handleOpinionCreated}
+        categories={categories}
       />
       
       <SystemPromptDialog
         open={isSystemPromptOpen}
         onOpenChange={setIsSystemPromptOpen}
+      />
+
+      <CategoriesDialog
+        open={isCategoriesOpen}
+        onOpenChange={setIsCategoriesOpen}
+        categories={categories}
+        onCategoriesChange={setCategories}
       />
     </div>
   );

@@ -13,14 +13,23 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { LegalOpinion } from "./AgentView";
+import { Category } from "./CategoriesDialog";
 
 interface OpinionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedOpinion: LegalOpinion | null;
   onOpinionCreated: (opinion: LegalOpinion) => void;
+  categories: Category[];
 }
 
 export const OpinionDialog = ({
@@ -28,6 +37,7 @@ export const OpinionDialog = ({
   onOpenChange,
   selectedOpinion,
   onOpinionCreated,
+  categories,
 }: OpinionDialogProps) => {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
@@ -174,13 +184,22 @@ export const OpinionDialog = ({
 
             <div className="space-y-2">
               <Label htmlFor="category">Categoria</Label>
-              <Input
-                id="category"
+              <Select
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="Ex: Direito Civil, Trabalhista, etc."
+                onValueChange={setCategory}
                 disabled={!!selectedOpinion}
-              />
+              >
+                <SelectTrigger id="category" className="bg-background">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

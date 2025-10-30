@@ -34,9 +34,11 @@ import { Label } from "@/components/ui/label";
 import { LegalOpinion } from "./AgentView";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
+import { Category } from "./CategoriesDialog";
 
 interface AgentSearchProps {
   onSelectOpinion: (opinion: LegalOpinion) => void;
+  categories: Category[];
 }
 
 // Simulação de base de pareceres
@@ -78,7 +80,7 @@ let mockOpinionsDatabase: LegalOpinion[] = [
   },
 ];
 
-export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
+export const AgentSearch = ({ onSelectOpinion, categories }: AgentSearchProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<LegalOpinion[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -443,12 +445,21 @@ export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-category">Categoria</Label>
-              <Input
-                id="edit-category"
+              <Select
                 value={editCategory}
-                onChange={(e) => setEditCategory(e.target.value)}
-                placeholder="Categoria do parecer"
-              />
+                onValueChange={setEditCategory}
+              >
+                <SelectTrigger id="edit-category" className="bg-background">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
