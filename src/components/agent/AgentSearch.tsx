@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Search, FileText, Upload, X, File } from "lucide-react";
+import { Search, FileText, Upload, X, File, Trash2, Edit } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,6 +12,25 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
 import { LegalOpinion } from "./AgentView";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,7 +40,7 @@ interface AgentSearchProps {
 }
 
 // Simulação de base de pareceres
-const mockOpinionsDatabase: LegalOpinion[] = [
+let mockOpinionsDatabase: LegalOpinion[] = [
   {
     id: "base-1",
     title: "Análise Contratual - Prestação de Serviços Continuados",
@@ -65,6 +84,11 @@ export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedOpinionForEdit, setSelectedOpinionForEdit] = useState<LegalOpinion | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editCategory, setEditCategory] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -107,6 +131,68 @@ export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
 
   const handleRemoveFile = (index: number) => {
     setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
+  };
+
+  const handleEditOpinion = (opinion: LegalOpinion, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedOpinionForEdit(opinion);
+    setEditTitle(opinion.title);
+    setEditCategory(opinion.category || "");
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!selectedOpinionForEdit) return;
+
+    const index = mockOpinionsDatabase.findIndex(op => op.id === selectedOpinionForEdit.id);
+    if (index !== -1) {
+      mockOpinionsDatabase[index] = {
+        ...mockOpinionsDatabase[index],
+        title: editTitle,
+        category: editCategory,
+      };
+
+      // Atualizar resultados da busca se houver
+      if (searchResults.length > 0) {
+        handleSearch();
+      }
+
+      toast({
+        title: "Parecer atualizado",
+        description: "As alterações foram salvas com sucesso.",
+      });
+    }
+
+    setIsEditDialogOpen(false);
+    setSelectedOpinionForEdit(null);
+  };
+
+  const handleDeleteOpinion = (opinion: LegalOpinion, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedOpinionForEdit(opinion);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!selectedOpinionForEdit) return;
+
+    const index = mockOpinionsDatabase.findIndex(op => op.id === selectedOpinionForEdit.id);
+    if (index !== -1) {
+      mockOpinionsDatabase.splice(index, 1);
+
+      // Atualizar resultados da busca
+      if (searchResults.length > 0) {
+        handleSearch();
+      }
+
+      toast({
+        title: "Parecer excluído",
+        description: "O parecer foi removido da base.",
+      });
+    }
+
+    setIsDeleteDialogOpen(false);
+    setSelectedOpinionForEdit(null);
   };
 
   const handleSearch = () => {
@@ -229,8 +315,8 @@ export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
                   onClick={() => onSelectOpinion(opinion)}
                 >
                   <div className="flex items-start gap-3">
-                    <FileText className="w-5 h-5 text-primary mt-1" />
-                    <div className="flex-1">
+                    <FileText className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-foreground">{opinion.title}</h3>
                       <div className="flex gap-4 mt-2 text-sm text-muted-foreground">
                         <span>{opinion.category}</span>
@@ -239,6 +325,26 @@ export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
                       <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
                         {opinion.content}
                       </p>
+                    </div>
+                    <div className="flex gap-1 flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => handleEditOpinion(opinion, e)}
+                        className="h-8 w-8"
+                        title="Editar"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => handleDeleteOpinion(opinion, e)}
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        title="Excluir"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -315,6 +421,65 @@ export const AgentSearch = ({ onSelectOpinion }: AgentSearchProps) => {
           </div>
         )}
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Editar Parecer</DialogTitle>
+            <DialogDescription>
+              Atualize o título e a categoria do parecer
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-title">Título</Label>
+              <Input
+                id="edit-title"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="Título do parecer"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-category">Categoria</Label>
+              <Input
+                id="edit-category"
+                value={editCategory}
+                onChange={(e) => setEditCategory(e.target.value)}
+                placeholder="Categoria do parecer"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveEdit}>
+              Salvar Alterações
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o parecer "{selectedOpinionForEdit?.title}"?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
