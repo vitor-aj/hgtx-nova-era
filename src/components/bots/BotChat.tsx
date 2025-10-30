@@ -47,22 +47,211 @@ export const BotChat = ({ bot, onBack }: BotChatProps) => {
   const createNewConversation = () => {
     const newConversation: BotConversation = {
       id: Date.now().toString(),
-      title: "Nova Conversa",
-      lastMessage: "Inicie uma conversa...",
+      title: "Exemplo de Conversa",
+      lastMessage: "Como criar uma API REST?",
       timestamp: "Agora",
     };
 
-    const initialMessage: Message = {
-      id: "1",
-      role: "assistant",
-      content: "Envie sua mensagem",
-      model: bot.model,
-    };
+    const initialMessages: Message[] = [
+      {
+        id: "1",
+        role: "user",
+        content: "Como criar uma API REST simples em Node.js?",
+      },
+      {
+        id: "2",
+        role: "assistant",
+        content: `Vou te mostrar como criar uma **API REST** básica usando **Express.js**:
+
+## 1. Instalação
+
+Primeiro, instale as dependências necessárias:
+
+\`\`\`bash
+npm init -y
+npm install express
+\`\`\`
+
+## 2. Código da API
+
+Crie um arquivo \`server.js\`:
+
+\`\`\`javascript
+const express = require('express');
+const app = express();
+const PORT = 3000;
+
+// Middleware para JSON
+app.use(express.json());
+
+// Dados de exemplo
+let users = [
+  { id: 1, name: 'João Silva', email: 'joao@email.com' },
+  { id: 2, name: 'Maria Santos', email: 'maria@email.com' }
+];
+
+// GET - Listar todos os usuários
+app.get('/api/users', (req, res) => {
+  res.json(users);
+});
+
+// GET - Buscar usuário por ID
+app.get('/api/users/:id', (req, res) => {
+  const user = users.find(u => u.id === parseInt(req.params.id));
+  if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+  res.json(user);
+});
+
+// POST - Criar novo usuário
+app.post('/api/users', (req, res) => {
+  const newUser = {
+    id: users.length + 1,
+    name: req.body.name,
+    email: req.body.email
+  };
+  users.push(newUser);
+  res.status(201).json(newUser);
+});
+
+// PUT - Atualizar usuário
+app.put('/api/users/:id', (req, res) => {
+  const user = users.find(u => u.id === parseInt(req.params.id));
+  if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+  
+  user.name = req.body.name || user.name;
+  user.email = req.body.email || user.email;
+  res.json(user);
+});
+
+// DELETE - Remover usuário
+app.delete('/api/users/:id', (req, res) => {
+  const index = users.findIndex(u => u.id === parseInt(req.params.id));
+  if (index === -1) return res.status(404).json({ error: 'Usuário não encontrado' });
+  
+  users.splice(index, 1);
+  res.status(204).send();
+});
+
+app.listen(PORT, () => {
+  console.log(\`Servidor rodando em http://localhost:\${PORT}\`);
+});
+\`\`\`
+
+## 3. Executar o servidor
+
+\`\`\`bash
+node server.js
+\`\`\`
+
+### Principais endpoints:
+
+- **GET** \`/api/users\` - Lista todos os usuários
+- **GET** \`/api/users/:id\` - Busca usuário específico
+- **POST** \`/api/users\` - Cria novo usuário
+- **PUT** \`/api/users/:id\` - Atualiza usuário
+- **DELETE** \`/api/users/:id\` - Remove usuário
+
+> 💡 **Dica**: Use ferramentas como **Postman** ou **Insomnia** para testar sua API!`,
+        model: bot.model,
+      },
+      {
+        id: "3",
+        role: "user",
+        content: "E como adiciono autenticação JWT?",
+      },
+      {
+        id: "4",
+        role: "assistant",
+        content: `Excelente pergunta! Vou mostrar como adicionar **autenticação JWT** à sua API:
+
+## 1. Instalar dependências
+
+\`\`\`bash
+npm install jsonwebtoken bcrypt
+\`\`\`
+
+## 2. Criar middleware de autenticação
+
+Crie \`middleware/auth.js\`:
+
+\`\`\`javascript
+const jwt = require('jsonwebtoken');
+const SECRET_KEY = 'sua-chave-secreta-aqui';
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token não fornecido' });
+  }
+
+  jwt.verify(token, SECRET_KEY, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Token inválido' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
+module.exports = { authenticateToken, SECRET_KEY };
+\`\`\`
+
+## 3. Adicionar rotas de autenticação
+
+\`\`\`javascript
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { SECRET_KEY, authenticateToken } = require('./middleware/auth');
+
+// Login
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+  
+  // Buscar usuário (em produção, use banco de dados)
+  const user = users.find(u => u.email === email);
+  if (!user) {
+    return res.status(401).json({ error: 'Credenciais inválidas' });
+  }
+
+  // Verificar senha
+  const validPassword = await bcrypt.compare(password, user.password);
+  if (!validPassword) {
+    return res.status(401).json({ error: 'Credenciais inválidas' });
+  }
+
+  // Gerar token
+  const token = jwt.sign(
+    { id: user.id, email: user.email },
+    SECRET_KEY,
+    { expiresIn: '24h' }
+  );
+
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+});
+
+// Proteger rotas com middleware
+app.get('/api/users', authenticateToken, (req, res) => {
+  res.json(users);
+});
+\`\`\`
+
+### Como usar:
+
+1. **Fazer login** e obter o token
+2. **Enviar o token** no header: \`Authorization: Bearer SEU_TOKEN_AQUI\`
+3. **Acessar rotas protegidas** com o token válido
+
+Isso garante que apenas usuários autenticados acessem suas rotas! 🔐`,
+        model: bot.model,
+      },
+    ];
 
     setConversations(prev => [newConversation, ...prev]);
     setConversationMessages(prev => ({
       ...prev,
-      [newConversation.id]: [initialMessage],
+      [newConversation.id]: initialMessages,
     }));
     setSelectedConversationId(newConversation.id);
   };
