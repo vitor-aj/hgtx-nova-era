@@ -175,12 +175,12 @@ const ConversationItem = ({
       onClick={onSelect}
     >
       <MessageSquare className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 overflow-hidden">
         <p className="text-sm font-medium truncate">{conversation.title}</p>
         <p className="text-xs text-muted-foreground truncate">
           {conversation.lastMessage}
         </p>
-        <p className="text-xs text-muted-foreground mt-0.5">
+        <p className="text-xs text-muted-foreground mt-0.5 truncate">
           {conversation.timestamp}
         </p>
       </div>
@@ -190,7 +190,7 @@ const ConversationItem = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="h-6 w-6 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
           >
             <MoreVertical className="w-3 h-3" />
           </Button>
