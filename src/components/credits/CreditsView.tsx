@@ -7,6 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Plus, Zap, DollarSign, Activity, TrendingUp } from "lucide-react";
 import { AddCreditsDialog } from "./AddCreditsDialog";
+import { PeriodFilter } from "./PeriodFilter";
 
 // Mock data
 const mockConsumptionData = [
@@ -61,20 +62,31 @@ export const CreditsView = () => {
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold gradient-text">Créditos</h1>
-          <p className="text-muted-foreground mt-1">
-            Acompanhe seu consumo e gerencie seus créditos
-          </p>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold gradient-text">Créditos</h1>
+            <p className="text-muted-foreground mt-1">
+              Acompanhe seu consumo e gerencie seus créditos
+            </p>
+          </div>
+          <Button
+            onClick={() => setIsAddCreditsOpen(true)}
+            className="cyber-glow gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar Créditos
+          </Button>
         </div>
-        <Button
-          onClick={() => setIsAddCreditsOpen(true)}
-          className="cyber-glow gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Adicionar Créditos
-        </Button>
+        
+        <div className="flex justify-end">
+          <PeriodFilter
+            onFilterChange={(filter, startDate, endDate) => {
+              console.log("Filter changed:", filter, startDate, endDate);
+              // Aqui você pode implementar a lógica de filtro
+            }}
+          />
+        </div>
       </div>
 
       {/* Stats Cards */}
