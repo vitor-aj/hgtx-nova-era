@@ -53,7 +53,13 @@ const Index = () => {
         />
       )}
       {activeView === "credits" && isAddingCredits && (
-        <AddCreditsView onBack={() => setIsAddingCredits(false)} />
+        <AddCreditsView 
+          onBack={() => setIsAddingCredits(false)}
+          onManageCards={() => {
+            setIsAddingCredits(false);
+            setIsManagingPayments(true);
+          }}
+        />
       )}
       {activeView === "credits" && isManagingPayments && (
         <ManagePaymentsView onBack={() => setIsManagingPayments(false)} />
