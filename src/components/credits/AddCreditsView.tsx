@@ -3,6 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreditCard, Smartphone, Check, ArrowLeft, Copy, Clock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import QRCode from "react-qr-code";
@@ -23,6 +25,11 @@ const creditPackages = [
   { value: 500, label: "$500" },
 ];
 
+const mockSavedCards = [
+  { id: 1, brand: "Visa", lastFour: "4532", expiryDate: "12/2025", holder: "João Silva" },
+  { id: 2, brand: "Mastercard", lastFour: "5412", expiryDate: "08/2026", holder: "João Silva" },
+];
+
 const cardSchema = z.object({
   cardHolder: z.string().min(3, "Nome do titular deve ter no mínimo 3 caracteres").max(100, "Nome muito longo"),
   cardNumber: z.string().regex(/^\d{4}\s\d{4}\s\d{4}\s\d{4}$/, "Número do cartão inválido"),
@@ -35,6 +42,10 @@ export const AddCreditsView = ({ onBack }: AddCreditsViewProps) => {
   const [selectedPackage, setSelectedPackage] = useState(50);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "pix">("card");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cardType, setCardType] = useState<"saved" | "new">("saved");
+  const [selectedSavedCardId, setSelectedSavedCardId] = useState<number | null>(
+    mockSavedCards.length > 0 ? mockSavedCards[0].id : null
+  );
 
   // Card form state
   const [cardHolder, setCardHolder] = useState("");
@@ -107,13 +118,26 @@ export const AddCreditsView = ({ onBack }: AddCreditsViewProps) => {
   };
 
   const handleCardPayment = async () => {
-    if (!validateCardForm()) {
-      toast({
-        title: "Erro no formulário",
-        description: "Por favor, corrija os erros antes de continuar.",
-        variant: "destructive",
-      });
-      return;
+    // Se for cartão salvo, não precisa validar o formulário
+    if (cardType === "saved") {
+      if (!selectedSavedCardId) {
+        toast({
+          title: "Erro",
+          description: "Por favor, selecione um cartão.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      // Se for novo cartão, valida o formulário
+      if (!validateCardForm()) {
+        toast({
+          title: "Erro no formulário",
+          description: "Por favor, corrija os erros antes de continuar.",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setIsProcessing(true);
@@ -278,101 +302,147 @@ export const AddCreditsView = ({ onBack }: AddCreditsViewProps) => {
             <CardContent className="p-6 space-y-4">
               <h3 className="text-lg font-semibold">Dados do Cartão</h3>
               
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="cardHolder">Nome do Titular</Label>
-                  <Input
-                    id="cardHolder"
-                    placeholder="Nome como está no cartão"
-                    value={cardHolder}
-                    onChange={(e) => setCardHolder(e.target.value.toUpperCase())}
-                    className={formErrors.cardHolder ? "border-destructive" : ""}
-                  />
-                  {formErrors.cardHolder && (
-                    <p className="text-sm text-destructive">{formErrors.cardHolder}</p>
-                  )}
+              {mockSavedCards.length > 0 && (
+                <div className="space-y-3">
+                  <Label>Escolha uma opção</Label>
+                  <RadioGroup value={cardType} onValueChange={(value: "saved" | "new") => setCardType(value)}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="saved" id="saved" />
+                      <Label htmlFor="saved" className="cursor-pointer font-normal">
+                        Usar cartão cadastrado
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="new" id="new" />
+                      <Label htmlFor="new" className="cursor-pointer font-normal">
+                        Usar novo cartão
+                      </Label>
+                    </div>
+                  </RadioGroup>
                 </div>
+              )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="cardNumber">Número do Cartão</Label>
-                  <InputMask
-                    mask="9999 9999 9999 9999"
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
+              {cardType === "saved" && mockSavedCards.length > 0 ? (
+                <div className="space-y-3">
+                  <Label htmlFor="savedCard">Selecione o cartão</Label>
+                  <Select 
+                    value={selectedSavedCardId?.toString()} 
+                    onValueChange={(value) => setSelectedSavedCardId(parseInt(value))}
                   >
-                    {(inputProps: any) => (
-                      <Input
-                        {...inputProps}
-                        id="cardNumber"
-                        placeholder="1234 5678 9012 3456"
-                        className={formErrors.cardNumber ? "border-destructive" : ""}
-                      />
-                    )}
-                  </InputMask>
-                  {formErrors.cardNumber && (
-                    <p className="text-sm text-destructive">{formErrors.cardNumber}</p>
-                  )}
+                    <SelectTrigger id="savedCard">
+                      <SelectValue placeholder="Selecione um cartão" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {mockSavedCards.map((card) => (
+                        <SelectItem key={card.id} value={card.id.toString()}>
+                          <div className="flex items-center gap-3">
+                            <CreditCard className="w-4 h-4" />
+                            <span>
+                              {card.brand} •••• {card.lastFour} - {card.holder}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
+              ) : (
+                <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="expiryDate">Data de Validade</Label>
+                    <Label htmlFor="cardHolder">Nome do Titular</Label>
+                    <Input
+                      id="cardHolder"
+                      placeholder="Nome como está no cartão"
+                      value={cardHolder}
+                      onChange={(e) => setCardHolder(e.target.value.toUpperCase())}
+                      className={formErrors.cardHolder ? "border-destructive" : ""}
+                    />
+                    {formErrors.cardHolder && (
+                      <p className="text-sm text-destructive">{formErrors.cardHolder}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="cardNumber">Número do Cartão</Label>
                     <InputMask
-                      mask="99/99"
-                      value={expiryDate}
-                      onChange={(e) => setExpiryDate(e.target.value)}
+                      mask="9999 9999 9999 9999"
+                      value={cardNumber}
+                      onChange={(e) => setCardNumber(e.target.value)}
                     >
                       {(inputProps: any) => (
                         <Input
                           {...inputProps}
-                          id="expiryDate"
-                          placeholder="MM/AA"
-                          className={formErrors.expiryDate ? "border-destructive" : ""}
+                          id="cardNumber"
+                          placeholder="1234 5678 9012 3456"
+                          className={formErrors.cardNumber ? "border-destructive" : ""}
                         />
                       )}
                     </InputMask>
-                    {formErrors.expiryDate && (
-                      <p className="text-sm text-destructive">{formErrors.expiryDate}</p>
+                    {formErrors.cardNumber && (
+                      <p className="text-sm text-destructive">{formErrors.cardNumber}</p>
                     )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="expiryDate">Data de Validade</Label>
+                      <InputMask
+                        mask="99/99"
+                        value={expiryDate}
+                        onChange={(e) => setExpiryDate(e.target.value)}
+                      >
+                        {(inputProps: any) => (
+                          <Input
+                            {...inputProps}
+                            id="expiryDate"
+                            placeholder="MM/AA"
+                            className={formErrors.expiryDate ? "border-destructive" : ""}
+                          />
+                        )}
+                      </InputMask>
+                      {formErrors.expiryDate && (
+                        <p className="text-sm text-destructive">{formErrors.expiryDate}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="cvv">CVV</Label>
+                      <Input
+                        id="cvv"
+                        placeholder="123"
+                        maxLength={4}
+                        value={cvv}
+                        onChange={(e) => setCvv(e.target.value.replace(/\D/g, ""))}
+                        className={formErrors.cvv ? "border-destructive" : ""}
+                      />
+                      {formErrors.cvv && (
+                        <p className="text-sm text-destructive">{formErrors.cvv}</p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cvv">CVV</Label>
-                    <Input
-                      id="cvv"
-                      placeholder="123"
-                      maxLength={4}
-                      value={cvv}
-                      onChange={(e) => setCvv(e.target.value.replace(/\D/g, ""))}
-                      className={formErrors.cvv ? "border-destructive" : ""}
-                    />
-                    {formErrors.cvv && (
-                      <p className="text-sm text-destructive">{formErrors.cvv}</p>
+                    <Label htmlFor="cpf">CPF</Label>
+                    <InputMask
+                      mask="999.999.999-99"
+                      value={cpf}
+                      onChange={(e) => setCpf(e.target.value)}
+                    >
+                      {(inputProps: any) => (
+                        <Input
+                          {...inputProps}
+                          id="cpf"
+                          placeholder="000.000.000-00"
+                          className={formErrors.cpf ? "border-destructive" : ""}
+                        />
+                      )}
+                    </InputMask>
+                    {formErrors.cpf && (
+                      <p className="text-sm text-destructive">{formErrors.cpf}</p>
                     )}
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="cpf">CPF</Label>
-                  <InputMask
-                    mask="999.999.999-99"
-                    value={cpf}
-                    onChange={(e) => setCpf(e.target.value)}
-                  >
-                    {(inputProps: any) => (
-                      <Input
-                        {...inputProps}
-                        id="cpf"
-                        placeholder="000.000.000-00"
-                        className={formErrors.cpf ? "border-destructive" : ""}
-                      />
-                    )}
-                  </InputMask>
-                  {formErrors.cpf && (
-                    <p className="text-sm text-destructive">{formErrors.cpf}</p>
-                  )}
-                </div>
-              </div>
+              )}
 
               <div className="pt-4">
                 <Button
